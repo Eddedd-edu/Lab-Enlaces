@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>EnlaceQuest: Laboratorio de Enlaces</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-color: #1a1b26; --panel-bg: #24283b; --text-color: #c0caf5;
+            --ionic: #f7768e; --polar: #e0af68; --apolar: #7dcfff;
+            --correct: #73daca; --error: #f7768e; --warning: #ff9e64;
+            --btn-bg: #414868; --accent: #7aa2f7;
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color); color: var(--text-color);
+            margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center;
+        }
+
+        header { text-align: center; width: 100%; max-width: 1200px; margin-bottom: 15px; }
+        h1 { margin: 0 0 5px 0; color: var(--accent); font-size: 1.8rem; }
+        #subtitle { margin: 0 0 15px 0; font-size: 1rem; opacity: 0.8; }
+        
+        .controls { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; width: 100%; }
+        .controls button {
+            background-color: var(--accent); color: #1a1b26; border: none; padding: 10px 15px;
+            border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 0.95rem;
+            flex: 1 1 auto; min-width: 100px; max-width: 180px; transition: transform 0.1s;
+        }
+        .controls button:active { transform: scale(0.95); }
+
+        /* Paneles */
+        .glass-panel {
+            background: rgba(36, 40, 59, 0.7); backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+            border-radius: 12px; padding: 15px; margin-bottom: 15px;
+        }
+
+        /* Misiones y Récords */
+        #mission-panel, #records-panel { display: none; width: 100%; max-width: 800px; text-align: center; }
+        #mission-panel { border-color: var(--correct); }
+        .mission-title { color: var(--correct); font-size: 1.1rem; margin: 0 0 5px 0; text-transform: uppercase; }
+        .mission-text { font-size: 1.2rem; font-weight: bold; margin: 0 0 15px 0; line-height: 1.3; color: #fff;}
+        .mission-stats { display: flex; justify-content: space-around; background: var(--panel-bg); padding: 10px; border-radius: 8px; font-weight: bold;}
+
+        #records-panel { border-color: var(--warning); position: relative; max-width: 500px; }
+        .records-scroll { max-height: 280px; overflow-y: auto; margin-bottom: 15px; padding-right: 5px; }
+        .records-scroll::-webkit-scrollbar { width: 6px; }
+        .records-scroll::-webkit-scrollbar-thumb { background: var(--warning); border-radius: 10px; }
+        .record-list { list-style: none; padding: 0; text-align: left; margin: 0; }
+        .record-list li { background: var(--panel-bg); margin-bottom: 8px; padding: 12px 15px; border-radius: 8px; display: flex; justify-content: space-between; font-weight: bold; border-left: 4px solid var(--warning); }
+        .close-x { position: absolute; top: 10px; right: 15px; font-size: 1.2rem; color: var(--error); cursor: pointer; width: 30px; height: 30px; display: flex; justify-content: center; align-items: center; border-radius: 50%; background: rgba(247, 118, 142, 0.1);}
+
+        /* Layout Principal */
+        #lab-section { display: flex; width: 100%; max-width: 1000px; gap: 15px; justify-content: center; flex-wrap: wrap; }
+        .panel { flex: 1; min-width: 300px; }
+
+        /* Selector de Átomos */
+        .atom-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 15px; }
+        .atom-btn {
+            background: var(--btn-bg); color: white; border: 2px solid transparent; border-radius: 8px;
+            padding: 10px 5px; cursor: pointer; display: flex; flex-direction: column; align-items: center;
+            transition: 0.2s;
+        }
+        .atom-btn strong { font-size: 1.4rem; color: var(--accent); }
+        .atom-btn small { font-size: 0.75rem; opacity: 0.8; }
+        .atom-btn:hover { background: #565f89; border-color: var(--accent); }
+        .atom-btn.metal strong { color: #f7768e; }
+        .atom-btn.nonmetal strong { color: #9ece6a; }
+
+        /* Pantalla de Reacción */
+        .slots-container { display: flex; justify-content: center; align-items: center; gap: 15px; margin-bottom: 15px; }
+        .slot { width: 80px; height: 80px; border: 2px dashed #565f89; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 2rem; font-weight: bold; background: #14151f; color: #565f89; }
+        .slot.filled { border: 2px solid var(--accent); color: white; background: #24283b; }
+        
+        canvas { background: #14151f; border-radius: 10px; border: 2px solid #3b4261; width: 100%; max-width: 450px; height: 250px; box-shadow: inset 0 0 20px rgba(0,0,0,0.8); margin: 0 auto; display: block; }
+
+        .action-btn { width: 100%; padding: 15px; font-size: 1.2rem; font-weight: bold; border-radius: 10px; border: none; cursor: pointer; margin-top: 15px; transition: 0.2s; }
+        .btn-react { background: var(--correct); color: #1a1b26; }
+        .btn-react:disabled { background: #565f89; color: #a9b1d6; cursor: not-allowed; }
+        .btn-clear { background: transparent; border: 1px solid var(--error); color: var(--error); margin-top: 10px;}
+
+        /* Resultados */
+        .result-box { margin-top: 15px; text-align: center; display: none; animation: fadeIn 0.5s; }
+        .delta-en { font-size: 2rem; font-weight: bold; margin: 10px 0; }
+        .bond-tag { display: inline-block; padding: 8px 15px; border-radius: 8px; font-weight: bold; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 1px;}
+        .tag-ionic { background: rgba(247, 118, 142, 0.2); color: var(--ionic); border: 1px solid var(--ionic); }
+        .tag-polar { background: rgba(224, 175, 104, 0.2); color: var(--polar); border: 1px solid var(--polar); }
+        .tag-apolar { background: rgba(125, 207, 255, 0.2); color: var(--apolar); border: 1px solid var(--apolar); }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+        @media (max-width: 768px) { #lab-section { flex-direction: column; } .atom-grid { grid-template-columns: repeat(4, 1fr); } }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>EnlaceQuest SJ</h1>
+        <p id="subtitle">Simulador de Electronegatividad y Enlaces</p>
+        <div class="controls">
+            <button onclick="setMode('libre')" style="background-color: #e0af68;">⚛️ Modo Libre</button>
+            <button onclick="startMissions()" style="background-color: var(--correct); color: #1a1b26;">🎯 Misiones</button>
+            <button onclick="toggleRecords()" style="background-color: var(--warning); color: #1a1b26;">🏆 Top Global</button>
+        </div>
+    </header>
+
+    <div id="mission-panel" class="glass-panel">
+        <h3 class="mission-title">Misión en Curso</h3>
+        <p class="mission-text" id="mission-desc">-</p>
+        <div class="mission-stats">
+            <div>Progreso: <span id="mission-tracker" style="color:var(--accent)">0/5</span></div>
+            <div>⏱️ <span id="time-display" style="color:var(--warning)">90</span>s</div>
+        </div>
+    </div>
+
+    <div id="records-panel" class="glass-panel">
+        <div class="close-x" onclick="toggleRecords()"><i class="fas fa-times"></i></div>
+        <h3 class="mission-title" style="color:var(--warning); margin-bottom: 15px;">Salón de la Fama</h3>
+        <div class="records-scroll"><ul class="record-list" id="record-list"></ul></div>
+    </div>
+
+    <div id="lab-section">
+        <div class="panel glass-panel">
+            <h3 style="margin-top:0; text-align:center; color:var(--accent);">Tabla de Reactivos</h3>
+            <p style="font-size:0.85rem; text-align:center; color:#a9b1d6;">Selecciona 2 elementos para combinarlos.</p>
+            
+            <div class="atom-grid" id="atom-grid">
+                </div>
+
+            <div class="slots-container">
+                <div id="slot1" class="slot" onclick="clearSlot(1)">1</div>
+                <div style="font-size: 1.5rem; color:#565f89;">+</div>
+                <div id="slot2" class="slot" onclick="clearSlot(2)">2</div>
+            </div>
+
+            <button id="btn-react" class="action-btn btn-react" onclick="startReaction()" disabled>Reaccionar</button>
+            <button class="action-btn btn-clear" onclick="clearAll()">Vaciar Tubos de Ensayo</button>
+        </div>
+
+        <div class="panel glass-panel">
+            <canvas id="bondCanvas" width="450" height="250"></canvas>
+            
+            <div id="result-box" class="result-box">
+                <div style="color:#a9b1d6; font-size:0.9rem;">Diferencia de Electronegatividad (ΔEN)</div>
+                <div id="en-math" style="font-family:monospace; margin-top:5px;">| 3.0 - 2.1 |</div>
+                <div id="delta-en" class="delta-en">0.9</div>
+                <div id="bond-type" class="bond-tag tag-polar">Covalente Polar</div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCw4JnCCFHVogAEXncodxi9jnwigO7qUIA",
+            authDomain: "quimicaquest.firebaseapp.com",
+            projectId: "quimicaquest",
+            storageBucket: "quimicaquest.firebasestorage.app",
+            messagingSenderId: "796534851347",
+            appId: "1:796534851347:web:ae85716a8b612d889b3ce6"
+        };
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // --- DATOS QUÍMICOS ---
+        const elements = {
+            "H":  { name: "Hidrógeno", en: 2.1, type: "nonmetal", color: "#ffffff", val: 1 },
+            "Na": { name: "Sodio",     en: 0.9, type: "metal",    color: "#f7768e", val: 1 },
+            "Mg": { name: "Magnesio",  en: 1.2, type: "metal",    color: "#ff9e64", val: 2 },
+            "C":  { name: "Carbono",   en: 2.5, type: "nonmetal", color: "#9ece6a", val: 4 },
+            "N":  { name: "Nitrógeno", en: 3.0, type: "nonmetal", color: "#7aa2f7", val: 5 },
+            "O":  { name: "Oxígeno",   en: 3.5, type: "nonmetal", color: "#bb9af7", val: 6 },
+            "F":  { name: "Flúor",     en: 4.0, type: "nonmetal", color: "#7dcfff", val: 7 },
+            "Cl": { name: "Cloro",     en: 3.1, type: "nonmetal", color: "#1abc9c", val: 7 }
+        };
+
+        // --- ESTADO DEL JUEGO ---
+        let slot1 = null;
+        let slot2 = null;
+        let animState = 'idle'; // idle, reacting, done
+        let animProgress = 0;
+        let currentBond = null;
+
+        // Misiones
+        let gameActive = false, currentMission = 0, timeLeft = 90, timer, totalScore = 0;
+        let activeMissions = [];
+        const allMissions = [
+            { text: "Crea un enlace COVALENTE APOLAR (ΔEN ≤ 0.4).", check: (res) => res.type === 'apolar' },
+            { text: "Crea Sal de Mesa (Sodio y Cloro).", check: (res) => (res.a==='Na' && res.b==='Cl') || (res.a==='Cl' && res.b==='Na') },
+            { text: "Crea un enlace IÓNICO (ΔEN > 1.7).", check: (res) => res.type === 'ionic' },
+            { text: "Crea un enlace COVALENTE POLAR (0.4 < ΔEN ≤ 1.7).", check: (res) => res.type === 'polar' },
+            { text: "Une el elemento más electronegativo con Hidrógeno.", check: (res) => (res.a==='F' && res.b==='H') || (res.a==='H' && res.b==='F') },
+            { text: "Forma una molécula de Oxígeno gaseoso (O2).", check: (res) => res.a==='O' && res.b==='O' },
+            { text: "Une Magnesio y Oxígeno.", check: (res) => (res.a==='Mg' && res.b==='O') || (res.a==='O' && res.b==='Mg') },
+            { text: "Busca un ΔEN exactamente igual a 0.5.", check: (res) => Math.abs(res.delta - 0.5) < 0.01 }
+        ];
+
+        // --- INICIALIZACIÓN UI ---
+        function initGrid() {
+            const grid = document.getElementById('atom-grid');
+            grid.innerHTML = '';
+            for (const [sym, data] of Object.entries(elements)) {
+                const btn = document.createElement('div');
+                btn.className = `atom-btn ${data.type}`;
+                btn.innerHTML = `<strong>${sym}</strong><small>EN: ${data.en}</small>`;
+                btn.onclick = () => selectAtom(sym);
+                grid.appendChild(btn);
+            }
+        }
+
+        window.selectAtom = (sym) => {
+            if (animState !== 'idle') return;
+            if (!slot1) {
+                slot1 = sym;
+                const el = document.getElementById('slot1');
+                el.innerText = sym; el.classList.add('filled');
+            } else if (!slot2) {
+                slot2 = sym;
+                const el = document.getElementById('slot2');
+                el.innerText = sym; el.classList.add('filled');
+            }
+            checkReady();
+            drawCanvas();
+        };
+
+        window.clearSlot = (num) => {
+            if (animState !== 'idle') return;
+            if (num === 1) { slot1 = null; document.getElementById('slot1').innerText = '1'; document.getElementById('slot1').classList.remove('filled'); }
+            if (num === 2) { slot2 = null; document.getElementById('slot2').innerText = '2'; document.getElementById('slot2').classList.remove('filled'); }
+            document.getElementById('result-box').style.display = 'none';
+            checkReady(); drawCanvas();
+        };
+
+        window.clearAll = () => { window.clearSlot(1); window.clearSlot(2); };
+
+        function checkReady() {
+            document.getElementById('btn-react').disabled = !(slot1 && slot2);
+        }
+
+        // --- LÓGICA DE REACCIÓN ---
+        window.startReaction = () => {
+            if (!slot1 || !slot2) return;
+            document.getElementById('btn-react').disabled = true;
+            document.getElementById('result-box').style.display = 'none';
+            
+            const e1 = elements[slot1].en;
+            const e2 = elements[slot2].en;
+            const delta = Math.abs(e1 - e2).toFixed(1);
+            
+            let type = '';
+            if (delta > 1.7) type = 'ionic';
+            else if (delta > 0.4) type = 'polar';
+            else type = 'apolar';
+
+            currentBond = { a: slot1, b: slot2, delta: parseFloat(delta), type: type, e1: e1, e2: e2 };
+            
+            animState = 'reacting';
+            animProgress = 0;
+            requestAnimationFrame(animateReaction);
+        };
+
+        function showResults() {
+            const res = document.getElementById('result-box');
+            document.getElementById('en-math').innerText = `| ${currentBond.e1} - ${currentBond.e2} |`;
+            document.getElementById('delta-en').innerText = currentBond.delta.toFixed(1);
+            
+            const tag = document.getElementById('bond-type');
+            tag.className = `bond-tag tag-${currentBond.type}`;
+            
+            if(currentBond.type === 'ionic') { tag.innerText = "Enlace Iónico"; tag.style.color = "var(--ionic)"; }
+            else if(currentBond.type === 'polar') { tag.innerText = "Covalente Polar"; tag.style.color = "var(--polar)"; }
+            else { tag.innerText = "Covalente Apolar"; tag.style.color = "var(--apolar)"; }
+            
+            res.style.display = 'block';
+
+            if (gameActive) {
+                setTimeout(() => {
+                    if (activeMissions[currentMission].check(currentBond)) {
+                        totalScore += timeLeft;
+                        currentMission++;
+                        animState = 'idle';
+                        window.clearAll();
+                        loadMission();
+                    }
+                }, 1500);
+            } else {
+                setTimeout(() => { animState = 'idle'; document.getElementById('btn-react').disabled = false; }, 500);
+            }
+        }
+
+        // --- CANVAS ANIMATION ---
+        const canvas = document.getElementById('bondCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function drawAtom(x, y, sym, data, isLeft, progress, bondData) {
+            // Círculo base
+            ctx.beginPath();
+            ctx.arc(x, y, 40, 0, Math.PI * 2);
+            ctx.fillStyle = "#24283b";
+            ctx.fill();
+            ctx.lineWidth = 3;
+            ctx.strokeStyle = data.color;
+            ctx.stroke();
+
+            // Símbolo
+            ctx.fillStyle = "#fff";
+            ctx.font = "bold 24px Arial";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillText(sym, x, y);
+
+            // Electrones (simplificado: 1 electrón de valencia representativo para la animación)
+            if (animState === 'idle') {
+                // Dibujar un puntito orbitando estático
+                const ex = x + (isLeft ? 55 : -55);
+                ctx.beginPath(); ctx.arc(ex, y, 6, 0, Math.PI*2); ctx.fillStyle = data.color; ctx.fill();
+            } else if (animState === 'reacting' || animState === 'done') {
+                if (bondData.type === 'ionic') {
+                    // Iónico: El de menor EN pierde su electrón
+                    const isLoser = (isLeft && bondData.e1 < bondData.e2) || (!isLeft && bondData.e2 < bondData.e1);
+                    if (isLoser) {
+                        // El electrón viaja al otro
+                        const startX = x + (isLeft ? 55 : -55);
+                        const endX = isLeft ? x + 180 : x - 180; // Hacia el ganador
+                        const curX = startX + (endX - startX) * progress;
+                        if(progress < 1) {
+                            ctx.beginPath(); ctx.arc(curX, y, 6, 0, Math.PI*2); ctx.fillStyle = data.color; ctx.fill();
+                        }
+                        if (progress > 0.8) { ctx.fillStyle = "rgba(247, 118, 142, 0.8)"; ctx.font = "bold 20px Arial"; ctx.fillText("+", x+25, y-25); }
+                    } else {
+                        // El ganador mantiene el suyo y recibe el otro
+                        ctx.beginPath(); ctx.arc(x + (isLeft ? 55 : -55), y - 10, 6, 0, Math.PI*2); ctx.fillStyle = data.color; ctx.fill();
+                        if (progress === 1) {
+                            ctx.beginPath(); ctx.arc(x + (isLeft ? 55 : -55), y + 10, 6, 0, Math.PI*2); ctx.fillStyle = "#fff"; ctx.fill(); // El robado
+                            ctx.fillStyle = "rgba(125, 207, 255, 0.8)"; ctx.font = "bold 24px Arial"; ctx.fillText("-", x+25, y-25);
+                        }
+                    }
+                } else {
+                    // Covalente: Se comparten en el medio
+                    const midX = 225; // Centro del canvas
+                    let shift = 0;
+                    if (bondData.type === 'polar') {
+                        // Se acerca al más electronegativo
+                        const isWinner = (isLeft && bondData.e1 > bondData.e2) || (!isLeft && bondData.e2 > bondData.e1);
+                        shift = isWinner ? (isLeft ? -20 : 20) : (isLeft ? 20 : -20);
+                        if (progress > 0.8) {
+                            ctx.fillStyle = "rgba(255,255,255,0.6)"; ctx.font = "italic 16px Arial";
+                            ctx.fillText(isWinner ? "δ-" : "δ+", x, y-50);
+                        }
+                    }
+                    
+                    const startX = x + (isLeft ? 55 : -55);
+                    const endX = midX + shift + (isLeft ? -5 : 5);
+                    const curX = startX + (endX - startX) * progress;
+                    
+                    ctx.beginPath(); ctx.arc(curX, y + (isLeft?-5:5), 6, 0, Math.PI*2); ctx.fillStyle = data.color; ctx.fill();
+                }
+            }
+        }
+
+        function drawCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Posiciones iniciales
+            let x1 = 100, x2 = 350;
+            const y = 125;
+
+            if ((animState === 'reacting' || animState === 'done') && currentBond.type !== 'ionic') {
+                // Acercamiento covalente
+                x1 = 100 + (60 * animProgress);
+                x2 = 350 - (60 * animProgress);
+            }
+
+            if (slot1) drawAtom(x1, y, slot1, elements[slot1], true, animProgress, currentBond);
+            if (slot2) drawAtom(x2, y, slot2, elements[slot2], false, animProgress, currentBond);
+        }
+
+        function animateReaction() {
+            animProgress += 0.02;
+            if (animProgress >= 1) {
+                animProgress = 1;
+                animState = 'done';
+                drawCanvas();
+                showResults();
+            } else {
+                drawCanvas();
+                requestAnimationFrame(animateReaction);
+            }
+        }
+
+        // --- SISTEMA DE MISIONES Y FIREBASE ---
+        window.setMode = (mode) => { 
+            gameActive = false; clearInterval(timer); 
+            document.getElementById('mission-panel').style.display = 'none'; 
+            document.getElementById('records-panel').style.display = 'none';
+            window.clearAll();
+        };
+
+        window.toggleRecords = async () => {
+            const panel = document.getElementById('records-panel');
+            if (panel.style.display === 'block') panel.style.display = 'none'; 
+            else { panel.style.display = 'block'; await updateRecordsUI(); }
+        };
+
+        async function updateRecordsUI() {
+            const list = document.getElementById('record-list');
+            list.innerHTML = '<li>Cargando...</li>';
+            try {
+                // NUEVA COLECCIÓN: records_enlace
+                const q = query(collection(db, "records_enlace"), orderBy("score", "desc"), limit(50));
+                const querySnapshot = await getDocs(q);
+                list.innerHTML = '';
+                if (querySnapshot.empty) { list.innerHTML = '<li>No hay récords aún.</li>'; return; }
+                
+                let index = 1;
+                querySnapshot.forEach((doc) => {
+                    const r = doc.data();
+                    const li = document.createElement('li');
+                    let medal = index === 1 ? '🥇 ' : index === 2 ? '🥈 ' : index === 3 ? '🥉 ' : `<span style="font-size:0.8rem; color:#a9b1d6;">#${index}</span> `;
+                    let style = index <= 3 ? `color: ${index===1?'#ffd700':index===2?'#c0c0c0':'#cd7f32'}; background: rgba(255,255,255,0.05);` : '';
+                    li.style.cssText = style;
+                    li.innerHTML = `<span>${medal}${r.name}</span><span style="color:var(--correct)">${r.score} pts</span>`;
+                    list.appendChild(li); index++;
+                });
+            } catch (e) { list.innerHTML = '<li>Error de conexión.</li>'; }
+        }
+
+        window.startMissions = () => {
+            activeMissions = [...allMissions].sort(() => 0.5 - Math.random()).slice(0, 5);
+            gameActive = true; currentMission = 0; totalScore = 0;
+            document.getElementById('mission-panel').style.display = 'block';
+            window.clearAll(); loadMission();
+        };
+
+        async function saveScore(name, score) {
+            if (!name || score <= 0) return;
+            try {
+                await addDoc(collection(db, "records_enlace"), { name: name.substring(0,12) || "Anónimo", score: score, date: new Date() });
+                alert("Récord guardado.");
+                window.toggleRecords();
+            } catch (e) { console.error("Error:", e); }
+        }
+
+        function loadMission() {
+            if (currentMission >= activeMissions.length) { 
+                clearInterval(timer);
+                const userName = prompt(`¡Misiones completadas! Puntos: ${totalScore}. Tu nombre:`);
+                if(userName) saveScore(userName, totalScore);
+                window.setMode('libre'); return; 
+            }
+            document.getElementById('mission-desc').innerText = activeMissions[currentMission].text;
+            document.getElementById('mission-tracker').innerText = `${currentMission + 1}/${activeMissions.length}`;
+            timeLeft = 90;
+            document.getElementById('time-display').innerText = timeLeft;
+            clearInterval(timer);
+            timer = setInterval(() => {
+                timeLeft--; document.getElementById('time-display').innerText = timeLeft;
+                if (timeLeft <= 0) { 
+                    clearInterval(timer); alert("¡Tiempo agotado!");
+                    const userName = prompt(`Juego terminado. Puntos: ${totalScore}. Tu nombre:`);
+                    if(userName) saveScore(userName, totalScore);
+                    window.setMode('libre'); 
+                }
+            }, 1000);
+        }
+
+        // Iniciar
+        window.onload = () => { initGrid(); drawCanvas(); };
+    </script>
+</body>
+</html>
