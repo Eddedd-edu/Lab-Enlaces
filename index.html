@@ -33,7 +33,6 @@
         }
         .controls button:active { transform: scale(0.95); }
 
-        /* Paneles */
         .glass-panel {
             background: rgba(36, 40, 59, 0.7); backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.1);
@@ -41,7 +40,6 @@
             border-radius: 12px; padding: 15px; margin-bottom: 15px;
         }
 
-        /* Misiones y Récords */
         #mission-panel, #records-panel { display: none; width: 100%; max-width: 800px; text-align: center; }
         #mission-panel { border-color: var(--correct); }
         .mission-title { color: var(--correct); font-size: 1.1rem; margin: 0 0 5px 0; text-transform: uppercase; }
@@ -56,28 +54,27 @@
         .record-list li { background: var(--panel-bg); margin-bottom: 8px; padding: 12px 15px; border-radius: 8px; display: flex; justify-content: space-between; font-weight: bold; border-left: 4px solid var(--warning); }
         .close-x { position: absolute; top: 10px; right: 15px; font-size: 1.2rem; color: var(--error); cursor: pointer; width: 30px; height: 30px; display: flex; justify-content: center; align-items: center; border-radius: 50%; background: rgba(247, 118, 142, 0.1);}
 
-        /* Layout Principal */
         #lab-section { display: flex; width: 100%; max-width: 1000px; gap: 15px; justify-content: center; flex-wrap: wrap; }
         .panel { flex: 1; min-width: 300px; }
 
-        /* Selector de Átomos */
         .atom-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 15px; }
         .atom-btn {
             background: var(--btn-bg); color: white; border: 2px solid transparent; border-radius: 8px;
-            padding: 10px 5px; cursor: pointer; display: flex; flex-direction: column; align-items: center;
+            padding: 8px 4px; cursor: pointer; display: flex; flex-direction: column; align-items: center;
             transition: 0.2s;
         }
-        .atom-btn strong { font-size: 1.4rem; color: var(--accent); }
-        .atom-btn small { font-size: 0.75rem; opacity: 0.8; }
+        .atom-btn strong { font-size: 1.3rem; color: var(--accent); }
+        .atom-btn small { font-size: 0.7rem; opacity: 0.8; }
         .atom-btn:hover { background: #565f89; border-color: var(--accent); }
         .atom-btn.metal strong { color: #f7768e; }
         .atom-btn.nonmetal strong { color: #9ece6a; }
 
-        /* Pantalla de Reacción */
-        .slots-container { display: flex; justify-content: center; align-items: center; gap: 15px; margin-bottom: 15px; }
-        .slot { width: 80px; height: 80px; border: 2px dashed #565f89; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 2rem; font-weight: bold; background: #14151f; color: #565f89; }
+        .slots-container { display: flex; justify-content: center; align-items: center; gap: 10px; margin-bottom: 15px; flex-wrap: wrap;}
+        .slot { width: 60px; height: 60px; border: 2px dashed #565f89; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 1.5rem; font-weight: bold; background: #14151f; color: #565f89; cursor: pointer;}
         .slot.filled { border: 2px solid var(--accent); color: white; background: #24283b; }
         
+        .equation-box { font-size: 1.8rem; font-weight: bold; color: var(--accent); text-align: center; margin-bottom: 15px; background: var(--panel-bg); padding: 10px; border-radius: 8px; border: 1px dashed var(--correct); display: none; }
+
         canvas { background: #14151f; border-radius: 10px; border: 2px solid #3b4261; width: 100%; max-width: 450px; height: 250px; box-shadow: inset 0 0 20px rgba(0,0,0,0.8); margin: 0 auto; display: block; }
 
         .action-btn { width: 100%; padding: 15px; font-size: 1.2rem; font-weight: bold; border-radius: 10px; border: none; cursor: pointer; margin-top: 15px; transition: 0.2s; }
@@ -85,9 +82,8 @@
         .btn-react:disabled { background: #565f89; color: #a9b1d6; cursor: not-allowed; }
         .btn-clear { background: transparent; border: 1px solid var(--error); color: var(--error); margin-top: 10px;}
 
-        /* Resultados */
         .result-box { margin-top: 15px; text-align: center; display: none; animation: fadeIn 0.5s; }
-        .delta-en { font-size: 2rem; font-weight: bold; margin: 10px 0; }
+        .delta-en { font-size: 2rem; font-weight: bold; margin: 5px 0 15px 0; }
         .bond-tag { display: inline-block; padding: 8px 15px; border-radius: 8px; font-weight: bold; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 1px;}
         .tag-ionic { background: rgba(247, 118, 142, 0.2); color: var(--ionic); border: 1px solid var(--ionic); }
         .tag-polar { background: rgba(224, 175, 104, 0.2); color: var(--polar); border: 1px solid var(--polar); }
@@ -102,7 +98,7 @@
 
     <header>
         <h1>EnlaceQuest SJ</h1>
-        <p id="subtitle">Simulador de Electronegatividad y Enlaces</p>
+        <p id="subtitle">Síntesis Molecular y Electronegatividad</p>
         <div class="controls">
             <button onclick="setMode('libre')" style="background-color: #e0af68;">⚛️ Modo Libre</button>
             <button onclick="startMissions()" style="background-color: var(--correct); color: #1a1b26;">🎯 Misiones</button>
@@ -128,7 +124,7 @@
     <div id="lab-section">
         <div class="panel glass-panel">
             <h3 style="margin-top:0; text-align:center; color:var(--accent);">Tabla de Reactivos</h3>
-            <p style="font-size:0.85rem; text-align:center; color:#a9b1d6;">Selecciona 2 elementos para combinarlos.</p>
+            <p style="font-size:0.85rem; text-align:center; color:#a9b1d6;">Selecciona 2 o 3 elementos para combinarlos.</p>
             
             <div class="atom-grid" id="atom-grid">
                 </div>
@@ -137,18 +133,20 @@
                 <div id="slot1" class="slot" onclick="clearSlot(1)">1</div>
                 <div style="font-size: 1.5rem; color:#565f89;">+</div>
                 <div id="slot2" class="slot" onclick="clearSlot(2)">2</div>
+                <div style="font-size: 1.5rem; color:#565f89;">+</div>
+                <div id="slot3" class="slot" onclick="clearSlot(3)">3</div>
             </div>
 
-            <button id="btn-react" class="action-btn btn-react" onclick="startReaction()" disabled>Reaccionar</button>
+            <button id="btn-react" class="action-btn btn-react" onclick="startReaction()" disabled>Sintetizar Compuesto</button>
             <button class="action-btn btn-clear" onclick="clearAll()">Vaciar Tubos de Ensayo</button>
         </div>
 
         <div class="panel glass-panel">
+            <div id="equation-display" class="equation-box">Na + Cl &rarr; NaCl</div>
             <canvas id="bondCanvas" width="450" height="250"></canvas>
             
             <div id="result-box" class="result-box">
-                <div style="color:#a9b1d6; font-size:0.9rem;">Diferencia de Electronegatividad (ΔEN)</div>
-                <div id="en-math" style="font-family:monospace; margin-top:5px;">| 3.0 - 2.1 |</div>
+                <div style="color:#a9b1d6; font-size:0.9rem; margin-top:10px;">Diferencia Máxima de Electronegatividad (ΔEN)</div>
                 <div id="delta-en" class="delta-en">0.9</div>
                 <div id="bond-type" class="bond-tag tag-polar">Covalente Polar</div>
             </div>
@@ -170,37 +168,41 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // --- DATOS QUÍMICOS ---
+        // --- DATOS QUÍMICOS COMPLETOS ---
         const elements = {
-            "H":  { name: "Hidrógeno", en: 2.1, type: "nonmetal", color: "#ffffff", val: 1 },
-            "Na": { name: "Sodio",     en: 0.9, type: "metal",    color: "#f7768e", val: 1 },
-            "Mg": { name: "Magnesio",  en: 1.2, type: "metal",    color: "#ff9e64", val: 2 },
-            "C":  { name: "Carbono",   en: 2.5, type: "nonmetal", color: "#9ece6a", val: 4 },
-            "N":  { name: "Nitrógeno", en: 3.0, type: "nonmetal", color: "#7aa2f7", val: 5 },
-            "O":  { name: "Oxígeno",   en: 3.5, type: "nonmetal", color: "#bb9af7", val: 6 },
-            "F":  { name: "Flúor",     en: 4.0, type: "nonmetal", color: "#7dcfff", val: 7 },
-            "Cl": { name: "Cloro",     en: 3.1, type: "nonmetal", color: "#1abc9c", val: 7 }
+            "H":  { name: "Hidrógeno", en: 2.1, type: "nonmetal", color: "#ffffff" },
+            "Na": { name: "Sodio",     en: 0.9, type: "metal",    color: "#f7768e" },
+            "Mg": { name: "Magnesio",  en: 1.2, type: "metal",    color: "#ff9e64" },
+            "K":  { name: "Potasio",   en: 0.8, type: "metal",    color: "#ff7a7a" },
+            "Ca": { name: "Calcio",    en: 1.0, type: "metal",    color: "#ffb86c" },
+            "C":  { name: "Carbono",   en: 2.5, type: "nonmetal", color: "#9ece6a" },
+            "N":  { name: "Nitrógeno", en: 3.0, type: "nonmetal", color: "#7aa2f7" },
+            "P":  { name: "Fósforo",   en: 2.1, type: "nonmetal", color: "#f1fa8c" },
+            "O":  { name: "Oxígeno",   en: 3.5, type: "nonmetal", color: "#bb9af7" },
+            "S":  { name: "Azufre",    en: 2.5, type: "nonmetal", color: "#50fa7b" },
+            "F":  { name: "Flúor",     en: 4.0, type: "nonmetal", color: "#7dcfff" },
+            "Cl": { name: "Cloro",     en: 3.1, type: "nonmetal", color: "#1abc9c" }
         };
 
         // --- ESTADO DEL JUEGO ---
-        let slot1 = null;
-        let slot2 = null;
+        let slots = [null, null, null];
+        let activeAtoms = [];
         let animState = 'idle'; // idle, reacting, done
         let animProgress = 0;
         let currentBond = null;
 
-        // Misiones
+        // Misiones Actualizadas para incluir las de 3 átomos
         let gameActive = false, currentMission = 0, timeLeft = 90, timer, totalScore = 0;
         let activeMissions = [];
         const allMissions = [
-            { text: "Crea un enlace COVALENTE APOLAR (ΔEN ≤ 0.4).", check: (res) => res.type === 'apolar' },
-            { text: "Crea Sal de Mesa (Sodio y Cloro).", check: (res) => (res.a==='Na' && res.b==='Cl') || (res.a==='Cl' && res.b==='Na') },
-            { text: "Crea un enlace IÓNICO (ΔEN > 1.7).", check: (res) => res.type === 'ionic' },
-            { text: "Crea un enlace COVALENTE POLAR (0.4 < ΔEN ≤ 1.7).", check: (res) => res.type === 'polar' },
-            { text: "Une el elemento más electronegativo con Hidrógeno.", check: (res) => (res.a==='F' && res.b==='H') || (res.a==='H' && res.b==='F') },
-            { text: "Forma una molécula de Oxígeno gaseoso (O2).", check: (res) => res.a==='O' && res.b==='O' },
-            { text: "Une Magnesio y Oxígeno.", check: (res) => (res.a==='Mg' && res.b==='O') || (res.a==='O' && res.b==='Mg') },
-            { text: "Busca un ΔEN exactamente igual a 0.5.", check: (res) => Math.abs(res.delta - 0.5) < 0.01 }
+            { text: "Sintetiza Agua (H2O).", check: (res) => res.rawFormula === 'H2O' },
+            { text: "Crea Dióxido de Carbono (CO2).", check: (res) => res.rawFormula === 'CO2' },
+            { text: "Crea Sal de Mesa (NaCl).", check: (res) => res.rawFormula === 'NaCl' },
+            { text: "Crea Cloruro de Calcio (CaCl2).", check: (res) => res.rawFormula === 'CaCl2' },
+            { text: "Forma una molécula biatómica de Oxígeno (O2).", check: (res) => res.rawFormula === 'O2' },
+            { text: "Crea un enlace COVALENTE APOLAR (ΔEN ≤ 0.4) con solo 2 átomos.", check: (res) => res.type === 'apolar' && res.atoms.length === 2 },
+            { text: "Construye una molécula IÓNICA usando 3 átomos.", check: (res) => res.type === 'ionic' && res.atoms.length === 3 },
+            { text: "Construye un compuesto COVALENTE POLAR con 3 átomos.", check: (res) => res.type === 'polar' && res.atoms.length === 3 }
         ];
 
         // --- INICIALIZACIÓN UI ---
@@ -218,49 +220,80 @@
 
         window.selectAtom = (sym) => {
             if (animState !== 'idle') return;
-            if (!slot1) {
-                slot1 = sym;
-                const el = document.getElementById('slot1');
-                el.innerText = sym; el.classList.add('filled');
-            } else if (!slot2) {
-                slot2 = sym;
-                const el = document.getElementById('slot2');
-                el.innerText = sym; el.classList.add('filled');
+            for (let i = 0; i < 3; i++) {
+                if (!slots[i]) {
+                    slots[i] = sym;
+                    const el = document.getElementById(`slot${i+1}`);
+                    el.innerText = sym; el.classList.add('filled');
+                    break;
+                }
             }
-            checkReady();
-            drawCanvas();
+            updateActiveAtoms();
         };
 
         window.clearSlot = (num) => {
             if (animState !== 'idle') return;
-            if (num === 1) { slot1 = null; document.getElementById('slot1').innerText = '1'; document.getElementById('slot1').classList.remove('filled'); }
-            if (num === 2) { slot2 = null; document.getElementById('slot2').innerText = '2'; document.getElementById('slot2').classList.remove('filled'); }
+            slots[num-1] = null;
+            const el = document.getElementById(`slot${num}`);
+            el.innerText = num; el.classList.remove('filled');
             document.getElementById('result-box').style.display = 'none';
-            checkReady(); drawCanvas();
+            document.getElementById('equation-display').style.display = 'none';
+            updateActiveAtoms();
         };
 
-        window.clearAll = () => { window.clearSlot(1); window.clearSlot(2); };
+        window.clearAll = () => { [1,2,3].forEach(n => window.clearSlot(n)); };
 
-        function checkReady() {
-            document.getElementById('btn-react').disabled = !(slot1 && slot2);
+        function updateActiveAtoms() {
+            activeAtoms = slots.filter(Boolean);
+            document.getElementById('btn-react').disabled = activeAtoms.length < 2;
+            drawCanvas();
+        }
+
+        function buildEquation() {
+            const reactants = activeAtoms.join(" + ");
+            
+            // Generador de Fórmula Química
+            const counts = {};
+            activeAtoms.forEach(a => counts[a] = (counts[a] || 0) + 1);
+            
+            // Ordenamos por Electronegatividad para una fórmula estándar aproximada
+            const sortedUnique = Object.keys(counts).sort((a,b) => elements[a].en - elements[b].en);
+            
+            let productRaw = "";
+            let productHTML = "";
+            sortedUnique.forEach(sym => {
+                productRaw += sym;
+                productHTML += sym;
+                if(counts[sym] > 1) {
+                    productRaw += counts[sym];
+                    productHTML += `<sub>${counts[sym]}</sub>`;
+                }
+            });
+
+            currentBond.rawFormula = productRaw;
+            
+            const eqBox = document.getElementById('equation-display');
+            eqBox.innerHTML = `${reactants} <span style="color:#fff">&rarr;</span> ${productHTML}`;
+            eqBox.style.display = 'block';
         }
 
         // --- LÓGICA DE REACCIÓN ---
         window.startReaction = () => {
-            if (!slot1 || !slot2) return;
+            if (activeAtoms.length < 2) return;
             document.getElementById('btn-react').disabled = true;
             document.getElementById('result-box').style.display = 'none';
             
-            const e1 = elements[slot1].en;
-            const e2 = elements[slot2].en;
-            const delta = Math.abs(e1 - e2).toFixed(1);
+            let maxDelta = 0;
+            for (let i = 0; i < activeAtoms.length - 1; i++) {
+                let d = Math.abs(elements[activeAtoms[i]].en - elements[activeAtoms[i+1]].en);
+                if (d > maxDelta) maxDelta = d;
+            }
             
-            let type = '';
-            if (delta > 1.7) type = 'ionic';
-            else if (delta > 0.4) type = 'polar';
-            else type = 'apolar';
+            let type = 'apolar';
+            if (maxDelta > 1.7) type = 'ionic';
+            else if (maxDelta > 0.4) type = 'polar';
 
-            currentBond = { a: slot1, b: slot2, delta: parseFloat(delta), type: type, e1: e1, e2: e2 };
+            currentBond = { atoms: activeAtoms, delta: parseFloat(maxDelta.toFixed(1)), type: type };
             
             animState = 'reacting';
             animProgress = 0;
@@ -268,14 +301,14 @@
         };
 
         function showResults() {
+            buildEquation();
             const res = document.getElementById('result-box');
-            document.getElementById('en-math').innerText = `| ${currentBond.e1} - ${currentBond.e2} |`;
             document.getElementById('delta-en').innerText = currentBond.delta.toFixed(1);
             
             const tag = document.getElementById('bond-type');
             tag.className = `bond-tag tag-${currentBond.type}`;
             
-            if(currentBond.type === 'ionic') { tag.innerText = "Enlace Iónico"; tag.style.color = "var(--ionic)"; }
+            if(currentBond.type === 'ionic') { tag.innerText = "Carácter Iónico"; tag.style.color = "var(--ionic)"; }
             else if(currentBond.type === 'polar') { tag.innerText = "Covalente Polar"; tag.style.color = "var(--polar)"; }
             else { tag.innerText = "Covalente Apolar"; tag.style.color = "var(--apolar)"; }
             
@@ -296,103 +329,105 @@
             }
         }
 
-        // --- CANVAS ANIMATION ---
+        // --- RENDERIZADO DEL CANVAS ---
         const canvas = document.getElementById('bondCanvas');
         const ctx = canvas.getContext('2d');
 
-        function drawAtom(x, y, sym, data, isLeft, progress, bondData) {
-            // Círculo base
-            ctx.beginPath();
-            ctx.arc(x, y, 40, 0, Math.PI * 2);
-            ctx.fillStyle = "#24283b";
-            ctx.fill();
-            ctx.lineWidth = 3;
-            ctx.strokeStyle = data.color;
-            ctx.stroke();
+        function drawAtomBase(x, y, sym, data) {
+            ctx.beginPath(); ctx.arc(x, y, 40, 0, Math.PI * 2);
+            ctx.fillStyle = "#24283b"; ctx.fill();
+            ctx.lineWidth = 3; ctx.strokeStyle = data.color; ctx.stroke();
 
-            // Símbolo
-            ctx.fillStyle = "#fff";
-            ctx.font = "bold 24px Arial";
-            ctx.textAlign = "center";
-            ctx.textBaseline = "middle";
+            ctx.fillStyle = "#fff"; ctx.font = "bold 24px Arial";
+            ctx.textAlign = "center"; ctx.textBaseline = "middle";
             ctx.fillText(sym, x, y);
+        }
 
-            // Electrones (simplificado: 1 electrón de valencia representativo para la animación)
-            if (animState === 'idle') {
-                // Dibujar un puntito orbitando estático
-                const ex = x + (isLeft ? 55 : -55);
-                ctx.beginPath(); ctx.arc(ex, y, 6, 0, Math.PI*2); ctx.fillStyle = data.color; ctx.fill();
-            } else if (animState === 'reacting' || animState === 'done') {
-                if (bondData.type === 'ionic') {
-                    // Iónico: El de menor EN pierde su electrón
-                    const isLoser = (isLeft && bondData.e1 < bondData.e2) || (!isLeft && bondData.e2 < bondData.e1);
-                    if (isLoser) {
-                        // El electrón viaja al otro
-                        const startX = x + (isLeft ? 55 : -55);
-                        const endX = isLeft ? x + 180 : x - 180; // Hacia el ganador
-                        const curX = startX + (endX - startX) * progress;
-                        if(progress < 1) {
-                            ctx.beginPath(); ctx.arc(curX, y, 6, 0, Math.PI*2); ctx.fillStyle = data.color; ctx.fill();
-                        }
-                        if (progress > 0.8) { ctx.fillStyle = "rgba(247, 118, 142, 0.8)"; ctx.font = "bold 20px Arial"; ctx.fillText("+", x+25, y-25); }
-                    } else {
-                        // El ganador mantiene el suyo y recibe el otro
-                        ctx.beginPath(); ctx.arc(x + (isLeft ? 55 : -55), y - 10, 6, 0, Math.PI*2); ctx.fillStyle = data.color; ctx.fill();
-                        if (progress === 1) {
-                            ctx.beginPath(); ctx.arc(x + (isLeft ? 55 : -55), y + 10, 6, 0, Math.PI*2); ctx.fillStyle = "#fff"; ctx.fill(); // El robado
-                            ctx.fillStyle = "rgba(125, 207, 255, 0.8)"; ctx.font = "bold 24px Arial"; ctx.fillText("-", x+25, y-25);
-                        }
-                    }
+        function drawElectrons(x1, x2, y, sym1, sym2, progress) {
+            const data1 = elements[sym1], data2 = elements[sym2];
+            
+            if(animState === 'idle') {
+                ctx.beginPath(); ctx.arc(x1 + 45, y, 5, 0, Math.PI*2); ctx.fillStyle = data1.color; ctx.fill();
+                ctx.beginPath(); ctx.arc(x2 - 45, y, 5, 0, Math.PI*2); ctx.fillStyle = data2.color; ctx.fill();
+                return;
+            }
+
+            const en1 = data1.en, en2 = data2.en;
+            const delta = Math.abs(en1 - en2);
+            const isIonic = delta > 1.7;
+            const isPolar = delta > 0.4 && delta <= 1.7;
+
+            if (isIonic) {
+                const p1Wins = en1 > en2;
+                const loserX = p1Wins ? x2 - 45 : x1 + 45;
+                const winnerX = p1Wins ? x1 + 55 : x2 - 55;
+                const loserColor = p1Wins ? data2.color : data1.color;
+
+                const curX = loserX + (winnerX - loserX) * progress;
+
+                if(progress < 1) {
+                    ctx.beginPath(); ctx.arc(curX, y, 5, 0, Math.PI*2); ctx.fillStyle = loserColor; ctx.fill();
+                    ctx.beginPath(); ctx.arc(winnerX, y - 10, 5, 0, Math.PI*2); ctx.fillStyle = p1Wins ? data1.color : data2.color; ctx.fill();
                 } else {
-                    // Covalente: Se comparten en el medio
-                    const midX = 225; // Centro del canvas
-                    let shift = 0;
-                    if (bondData.type === 'polar') {
-                        // Se acerca al más electronegativo
-                        const isWinner = (isLeft && bondData.e1 > bondData.e2) || (!isLeft && bondData.e2 > bondData.e1);
-                        shift = isWinner ? (isLeft ? -20 : 20) : (isLeft ? 20 : -20);
-                        if (progress > 0.8) {
-                            ctx.fillStyle = "rgba(255,255,255,0.6)"; ctx.font = "italic 16px Arial";
-                            ctx.fillText(isWinner ? "δ-" : "δ+", x, y-50);
-                        }
-                    }
-                    
-                    const startX = x + (isLeft ? 55 : -55);
-                    const endX = midX + shift + (isLeft ? -5 : 5);
-                    const curX = startX + (endX - startX) * progress;
-                    
-                    ctx.beginPath(); ctx.arc(curX, y + (isLeft?-5:5), 6, 0, Math.PI*2); ctx.fillStyle = data.color; ctx.fill();
+                    ctx.beginPath(); ctx.arc(winnerX, y + 10, 5, 0, Math.PI*2); ctx.fillStyle = loserColor; ctx.fill();
+                    ctx.beginPath(); ctx.arc(winnerX, y - 10, 5, 0, Math.PI*2); ctx.fillStyle = p1Wins ? data1.color : data2.color; ctx.fill();
+
+                    ctx.fillStyle = "rgba(247, 118, 142, 0.9)"; ctx.font = "bold 20px Arial";
+                    ctx.fillText("+", p1Wins ? x2 : x1, y - 50);
+                    ctx.fillStyle = "rgba(125, 207, 255, 0.9)";
+                    ctx.fillText("-", p1Wins ? x1 : x2, y - 50);
                 }
+            } else {
+                const midX = (x1 + x2) / 2;
+                let shift = 0;
+                if(isPolar) {
+                    shift = en1 > en2 ? -15 : 15;
+                    if(progress > 0.8) {
+                        ctx.fillStyle = "rgba(255,255,255,0.6)"; ctx.font = "italic 16px Arial";
+                        ctx.fillText(en1 > en2 ? "δ-" : "δ+", x1, y - 50);
+                        ctx.fillText(en2 > en1 ? "δ-" : "δ+", x2, y - 50);
+                    }
+                }
+                const targetX = midX + shift;
+                const cur1X = (x1 + 45) + (targetX - 5 - (x1 + 45)) * progress;
+                const cur2X = (x2 - 45) + (targetX + 5 - (x2 - 45)) * progress;
+
+                ctx.beginPath(); ctx.arc(cur1X, y + 5, 5, 0, Math.PI*2); ctx.fillStyle = data1.color; ctx.fill();
+                ctx.beginPath(); ctx.arc(cur2X, y - 5, 5, 0, Math.PI*2); ctx.fillStyle = data2.color; ctx.fill();
             }
         }
 
         function drawCanvas() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
-            // Posiciones iniciales
-            let x1 = 100, x2 = 350;
-            const y = 125;
+            const num = activeAtoms.length;
+            if(num === 0) return;
 
-            if ((animState === 'reacting' || animState === 'done') && currentBond.type !== 'ionic') {
-                // Acercamiento covalente
-                x1 = 100 + (60 * animProgress);
-                x2 = 350 - (60 * animProgress);
+            const startPositions = num === 2 ? [100, 350] : [75, 225, 375];
+            const endPositions   = num === 2 ? [175, 275] : [125, 225, 325];
+
+            const currentPositions = startPositions.map((start, i) => {
+                if(currentBond && currentBond.type !== 'ionic') {
+                    return start + (endPositions[i] - start) * (animState === 'idle' ? 0 : animProgress);
+                }
+                return start;
+            });
+
+            activeAtoms.forEach((sym, i) => {
+                drawAtomBase(currentPositions[i], 125, sym, elements[sym]);
+            });
+
+            for(let i=0; i < num - 1; i++) {
+                drawElectrons(currentPositions[i], currentPositions[i+1], 125, activeAtoms[i], activeAtoms[i+1], animProgress);
             }
-
-            if (slot1) drawAtom(x1, y, slot1, elements[slot1], true, animProgress, currentBond);
-            if (slot2) drawAtom(x2, y, slot2, elements[slot2], false, animProgress, currentBond);
         }
 
         function animateReaction() {
             animProgress += 0.02;
             if (animProgress >= 1) {
-                animProgress = 1;
-                animState = 'done';
-                drawCanvas();
-                showResults();
+                animProgress = 1; animState = 'done';
+                drawCanvas(); showResults();
             } else {
-                drawCanvas();
-                requestAnimationFrame(animateReaction);
+                drawCanvas(); requestAnimationFrame(animateReaction);
             }
         }
 
@@ -414,7 +449,6 @@
             const list = document.getElementById('record-list');
             list.innerHTML = '<li>Cargando...</li>';
             try {
-                // NUEVA COLECCIÓN: records_enlace
                 const q = query(collection(db, "records_enlace"), orderBy("score", "desc"), limit(50));
                 const querySnapshot = await getDocs(q);
                 list.innerHTML = '';
@@ -472,7 +506,6 @@
             }, 1000);
         }
 
-        // Iniciar
         window.onload = () => { initGrid(); drawCanvas(); };
     </script>
 </body>
