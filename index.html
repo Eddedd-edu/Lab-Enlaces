@@ -40,7 +40,13 @@
             border-radius: 12px; padding: 15px; margin-bottom: 15px;
         }
 
-        #mission-panel, #records-panel { display: none; width: 100%; max-width: 800px; text-align: center; }
+        #login-panel, #mission-panel, #records-panel { display: none; width: 100%; max-width: 800px; text-align: center; }
+        
+        /* Estilos Login */
+        #login-panel { max-width: 400px; margin: 0 auto 15px auto; border-color: var(--accent); }
+        .login-input { width: 100%; padding: 12px; border-radius: 8px; border: none; margin-bottom: 15px; background: #14151f; color: #fff; font-size: 1rem; text-align: center; }
+        .login-input:focus { outline: 2px solid var(--accent); }
+
         #mission-panel { border-color: var(--correct); }
         .mission-title { color: var(--correct); font-size: 1.1rem; margin: 0 0 5px 0; text-transform: uppercase; }
         .mission-text { font-size: 1.2rem; font-weight: bold; margin: 0 0 15px 0; line-height: 1.3; color: #fff;}
@@ -101,13 +107,21 @@
         <p id="subtitle">Síntesis Molecular y Electronegatividad</p>
         <div class="controls">
             <button onclick="setMode('libre')" style="background-color: #e0af68;">⚛️ Modo Libre</button>
-            <button onclick="startMissions()" style="background-color: var(--correct); color: #1a1b26;">🎯 Misiones</button>
+            <button onclick="showLogin()" style="background-color: var(--correct); color: #1a1b26;">🎯 Misiones</button>
             <button onclick="toggleRecords()" style="background-color: var(--warning); color: #1a1b26;">🏆 Top Global</button>
         </div>
     </header>
 
+    <div id="login-panel" class="glass-panel">
+        <h3 style="color:var(--accent); margin-top:0;">Autenticación de Estudiante</h3>
+        <p style="font-size:0.9rem; margin-bottom:15px; color:#a9b1d6;">Ingresa tu código ZipGrade para registrar tu progreso en el Top Global.</p>
+        <input type="number" id="zip-input" class="login-input" placeholder="Tu Código ZipGrade">
+        <button class="action-btn btn-react" onclick="validateZip()" id="btn-validate">Verificar e Iniciar</button>
+        <div id="login-error" style="color:var(--error); margin-top:10px; font-weight:bold;"></div>
+    </div>
+
     <div id="mission-panel" class="glass-panel">
-        <h3 class="mission-title">Misión en Curso</h3>
+        <h3 class="mission-title">Misión en Curso - Jugador: <span id="player-name" style="color:white;"></span></h3>
         <p class="mission-text" id="mission-desc">-</p>
         <div class="mission-stats">
             <div>Progreso: <span id="mission-tracker" style="color:var(--accent)">0/5</span></div>
@@ -155,7 +169,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, getDocs, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, getDocs, query, orderBy, limit, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCw4JnCCFHVogAEXncodxi9jnwigO7qUIA",
@@ -190,6 +204,7 @@
         let animState = 'idle'; // idle, reacting, done
         let animProgress = 0;
         let currentBond = null;
+        let currentStudentName = ""; // Almacenará el nombre validado
 
         // Misiones Actualizadas para incluir las de 3 átomos
         let gameActive = false, currentMission = 0, timeLeft = 90, timer, totalScore = 0;
@@ -431,18 +446,64 @@
             }
         }
 
-        // --- SISTEMA DE MISIONES Y FIREBASE ---
+        // --- SISTEMA DE LOGIN, MISIONES Y FIREBASE ---
         window.setMode = (mode) => { 
             gameActive = false; clearInterval(timer); 
             document.getElementById('mission-panel').style.display = 'none'; 
             document.getElementById('records-panel').style.display = 'none';
+            document.getElementById('login-panel').style.display = 'none';
             window.clearAll();
+        };
+
+        window.showLogin = () => {
+            window.setMode('libre');
+            document.getElementById('login-panel').style.display = 'block';
+        };
+
+        window.validateZip = async () => {
+            const zip = document.getElementById('zip-input').value.trim();
+            const err = document.getElementById('login-error');
+            const btn = document.getElementById('btn-validate');
+            
+            if(!zip) { err.innerText = "Ingresa tu código ZipGrade."; return; }
+            
+            btn.disabled = true;
+            btn.innerText = "Verificando...";
+            err.innerText = "";
+
+            try {
+                // Busca en la colección "estudiantes" el documento que coincida con el ZipGrade
+                const docRef = doc(db, "estudiantes", zip);
+                const docSnap = await getDoc(docRef);
+                
+                if(docSnap.exists()) {
+                    const data = docSnap.data();
+                    // Compatibilidad: busca el campo 'nombre' o une 'First Name' y 'Last Name'
+                    currentStudentName = data.nombre || `${data["First Name"] || ''} ${data["Last Name"] || ''}`.trim() || "Estudiante";
+                    
+                    document.getElementById('login-panel').style.display = 'none';
+                    document.getElementById('player-name').innerText = currentStudentName;
+                    startMissions();
+                } else {
+                    err.innerText = "Código no encontrado. Verifica tu ZipGrade.";
+                }
+            } catch(e) {
+                err.innerText = "Error de conexión con Firebase.";
+                console.error(e);
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "Verificar e Iniciar";
+            }
         };
 
         window.toggleRecords = async () => {
             const panel = document.getElementById('records-panel');
             if (panel.style.display === 'block') panel.style.display = 'none'; 
-            else { panel.style.display = 'block'; await updateRecordsUI(); }
+            else { 
+                window.setMode('libre'); // Cierra otros paneles
+                panel.style.display = 'block'; 
+                await updateRecordsUI(); 
+            }
         };
 
         async function updateRecordsUI() {
@@ -467,28 +528,33 @@
             } catch (e) { list.innerHTML = '<li>Error de conexión.</li>'; }
         }
 
-        window.startMissions = () => {
+        function startMissions() {
             activeMissions = [...allMissions].sort(() => 0.5 - Math.random()).slice(0, 5);
             gameActive = true; currentMission = 0; totalScore = 0;
             document.getElementById('mission-panel').style.display = 'block';
             window.clearAll(); loadMission();
-        };
+        }
 
         async function saveScore(name, score) {
             if (!name || score <= 0) return;
             try {
-                await addDoc(collection(db, "records_enlace"), { name: name.substring(0,12) || "Anónimo", score: score, date: new Date() });
-                alert("Récord guardado.");
+                // Guarda el récord en la colección 'records_enlace'
+                await addDoc(collection(db, "records_enlace"), { 
+                    name: name.substring(0, 25) || "Anónimo", 
+                    score: score, 
+                    date: new Date() 
+                });
+                alert(`¡Felicidades ${name}! Has conseguido ${score} puntos. Tu récord ha sido guardado en el Salón de la Fama.`);
                 window.toggleRecords();
-            } catch (e) { console.error("Error:", e); }
+            } catch (e) { console.error("Error al guardar récord:", e); }
         }
 
         function loadMission() {
             if (currentMission >= activeMissions.length) { 
                 clearInterval(timer);
-                const userName = prompt(`¡Misiones completadas! Puntos: ${totalScore}. Tu nombre:`);
-                if(userName) saveScore(userName, totalScore);
-                window.setMode('libre'); return; 
+                saveScore(currentStudentName, totalScore);
+                window.setMode('libre'); 
+                return; 
             }
             document.getElementById('mission-desc').innerText = activeMissions[currentMission].text;
             document.getElementById('mission-tracker').innerText = `${currentMission + 1}/${activeMissions.length}`;
@@ -499,8 +565,7 @@
                 timeLeft--; document.getElementById('time-display').innerText = timeLeft;
                 if (timeLeft <= 0) { 
                     clearInterval(timer); alert("¡Tiempo agotado!");
-                    const userName = prompt(`Juego terminado. Puntos: ${totalScore}. Tu nombre:`);
-                    if(userName) saveScore(userName, totalScore);
+                    saveScore(currentStudentName, totalScore);
                     window.setMode('libre'); 
                 }
             }, 1000);
