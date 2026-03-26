@@ -107,24 +107,24 @@
         <p id="subtitle">Síntesis Molecular y Electronegatividad</p>
         <div class="controls">
             <button onclick="setMode('libre')" style="background-color: #e0af68;">⚛️ Modo Libre</button>
-            <button onclick="showLogin()" style="background-color: var(--correct); color: #1a1b26;">🎯 Misiones</button>
+            <button onclick="showLogin()" style="background-color: var(--correct); color: #1a1b26;">🎯 Evaluación</button>
             <button onclick="toggleRecords()" style="background-color: var(--warning); color: #1a1b26;">🏆 Top Global</button>
         </div>
     </header>
 
     <div id="login-panel" class="glass-panel">
         <h3 style="color:var(--accent); margin-top:0;">Autenticación de Estudiante</h3>
-        <p style="font-size:0.9rem; margin-bottom:15px; color:#a9b1d6;">Ingresa tu código ZipGrade para registrar tu progreso en el Top Global.</p>
+        <p style="font-size:0.9rem; margin-bottom:15px; color:#a9b1d6;">Ingresa tu código ZipGrade para iniciar la evaluación.</p>
         <input type="number" id="zip-input" class="login-input" placeholder="Tu Código ZipGrade">
         <button class="action-btn btn-react" onclick="validateZip()" id="btn-validate">Verificar e Iniciar</button>
         <div id="login-error" style="color:var(--error); margin-top:10px; font-weight:bold;"></div>
     </div>
 
     <div id="mission-panel" class="glass-panel">
-        <h3 class="mission-title">Misión en Curso - Jugador: <span id="player-name" style="color:white;"></span></h3>
+        <h3 class="mission-title">Evaluación - Jugador: <span id="player-name" style="color:white;"></span></h3>
         <p class="mission-text" id="mission-desc">-</p>
         <div class="mission-stats">
-            <div>Progreso: <span id="mission-tracker" style="color:var(--accent)">0/5</span></div>
+            <div>Pregunta: <span id="mission-tracker" style="color:var(--accent)">0/5</span></div>
             <div>⏱️ <span id="time-display" style="color:var(--warning)">90</span>s</div>
         </div>
     </div>
@@ -201,13 +201,13 @@
         // --- ESTADO DEL JUEGO ---
         let slots = [null, null, null];
         let activeAtoms = [];
-        let animState = 'idle'; // idle, reacting, done
+        let animState = 'idle'; 
         let animProgress = 0;
         let currentBond = null;
-        let currentStudentName = ""; // Almacenará el nombre validado
+        let currentStudentName = ""; 
 
-        // Misiones Actualizadas para incluir las de 3 átomos
-        let gameActive = false, currentMission = 0, timeLeft = 90, timer, totalScore = 0;
+        // Banco de 20 misiones
+        let gameActive = false, currentMission = 0, timeLeft = 90, timer, correctAnswers = 0;
         let activeMissions = [];
         const allMissions = [
             { text: "Sintetiza Agua (H2O).", check: (res) => res.rawFormula === 'H2O' },
@@ -217,7 +217,19 @@
             { text: "Forma una molécula biatómica de Oxígeno (O2).", check: (res) => res.rawFormula === 'O2' },
             { text: "Crea un enlace COVALENTE APOLAR (ΔEN ≤ 0.4) con solo 2 átomos.", check: (res) => res.type === 'apolar' && res.atoms.length === 2 },
             { text: "Construye una molécula IÓNICA usando 3 átomos.", check: (res) => res.type === 'ionic' && res.atoms.length === 3 },
-            { text: "Construye un compuesto COVALENTE POLAR con 3 átomos.", check: (res) => res.type === 'polar' && res.atoms.length === 3 }
+            { text: "Construye un compuesto COVALENTE POLAR con 3 átomos.", check: (res) => res.type === 'polar' && res.atoms.length === 3 },
+            { text: "Sintetiza Ácido Sulfhídrico (H2S).", check: (res) => res.rawFormula === 'H2S' },
+            { text: "Forma una molécula biatómica de Nitrógeno (N2).", check: (res) => res.rawFormula === 'N2' },
+            { text: "Sintetiza Óxido de Magnesio (MgO).", check: (res) => res.rawFormula === 'MgO' },
+            { text: "Crea Fluoruro de Sodio (NaF).", check: (res) => res.rawFormula === 'NaF' },
+            { text: "Sintetiza Cloruro de Potasio (KCl).", check: (res) => res.rawFormula === 'KCl' },
+            { text: "Construye una molécula de Flúor (F2).", check: (res) => res.rawFormula === 'F2' },
+            { text: "Sintetiza Monóxido de Carbono (CO).", check: (res) => res.rawFormula === 'CO' },
+            { text: "Forma un compuesto de Magnesio y Flúor (MgF2).", check: (res) => res.rawFormula === 'MgF2' },
+            { text: "Sintetiza Óxido de Calcio (CaO).", check: (res) => res.rawFormula === 'CaO' },
+            { text: "Crea Dióxido de Azufre (SO2).", check: (res) => res.rawFormula === 'SO2' },
+            { text: "Sintetiza Ozono (O3).", check: (res) => res.rawFormula === 'O3' },
+            { text: "Crea una molécula biatómica de Cloro (Cl2).", check: (res) => res.rawFormula === 'Cl2' }
         ];
 
         // --- INICIALIZACIÓN UI ---
@@ -267,11 +279,9 @@
         function buildEquation() {
             const reactants = activeAtoms.join(" + ");
             
-            // Generador de Fórmula Química
             const counts = {};
             activeAtoms.forEach(a => counts[a] = (counts[a] || 0) + 1);
             
-            // Ordenamos por Electronegatividad para una fórmula estándar aproximada
             const sortedUnique = Object.keys(counts).sort((a,b) => elements[a].en - elements[b].en);
             
             let productRaw = "";
@@ -332,13 +342,16 @@
             if (gameActive) {
                 setTimeout(() => {
                     if (activeMissions[currentMission].check(currentBond)) {
-                        totalScore += timeLeft;
-                        currentMission++;
-                        animState = 'idle';
-                        window.clearAll();
-                        loadMission();
+                        alert("¡Correcto!");
+                        correctAnswers++;
+                    } else {
+                        alert(`¡Incorrecto! El compuesto sintetizado no cumple con el objetivo de la misión.\nEl correcto dependía de la misión solicitada.`);
                     }
-                }, 1500);
+                    currentMission++;
+                    animState = 'idle';
+                    window.clearAll();
+                    loadMission();
+                }, 1000);
             } else {
                 setTimeout(() => { animState = 'idle'; document.getElementById('btn-react').disabled = false; }, 500);
             }
@@ -467,18 +480,21 @@
             
             if(!zip) { err.innerText = "Ingresa tu código ZipGrade."; return; }
             
+            if(localStorage.getItem('examen_realizado_' + zip)) {
+                err.innerText = "Ya has presentado esta evaluación y no puedes volver a ingresar.";
+                return;
+            }
+            
             btn.disabled = true;
             btn.innerText = "Verificando...";
             err.innerText = "";
 
             try {
-                // Busca en la colección "estudiantes" el documento que coincida con el ZipGrade
                 const docRef = doc(db, "estudiantes", zip);
                 const docSnap = await getDoc(docRef);
                 
                 if(docSnap.exists()) {
                     const data = docSnap.data();
-                    // Compatibilidad: busca el campo 'nombre' o une 'First Name' y 'Last Name'
                     currentStudentName = data.nombre || `${data["First Name"] || ''} ${data["Last Name"] || ''}`.trim() || "Estudiante";
                     
                     document.getElementById('login-panel').style.display = 'none';
@@ -500,7 +516,7 @@
             const panel = document.getElementById('records-panel');
             if (panel.style.display === 'block') panel.style.display = 'none'; 
             else { 
-                window.setMode('libre'); // Cierra otros paneles
+                window.setMode('libre');
                 panel.style.display = 'block'; 
                 await updateRecordsUI(); 
             }
@@ -513,7 +529,7 @@
                 const q = query(collection(db, "records_enlace"), orderBy("score", "desc"), limit(50));
                 const querySnapshot = await getDocs(q);
                 list.innerHTML = '';
-                if (querySnapshot.empty) { list.innerHTML = '<li>No hay récords aún.</li>'; return; }
+                if (querySnapshot.empty) { list.innerHTML = '<li>No hay notas aún.</li>'; return; }
                 
                 let index = 1;
                 querySnapshot.forEach((doc) => {
@@ -522,37 +538,40 @@
                     let medal = index === 1 ? '🥇 ' : index === 2 ? '🥈 ' : index === 3 ? '🥉 ' : `<span style="font-size:0.8rem; color:#a9b1d6;">#${index}</span> `;
                     let style = index <= 3 ? `color: ${index===1?'#ffd700':index===2?'#c0c0c0':'#cd7f32'}; background: rgba(255,255,255,0.05);` : '';
                     li.style.cssText = style;
-                    li.innerHTML = `<span>${medal}${r.name}</span><span style="color:var(--correct)">${r.score} pts</span>`;
+                    li.innerHTML = `<span>${medal}${r.name}</span><span style="color:var(--correct)">Nota: ${r.score}</span>`;
                     list.appendChild(li); index++;
                 });
             } catch (e) { list.innerHTML = '<li>Error de conexión.</li>'; }
         }
 
         function startMissions() {
+            const zip = document.getElementById('zip-input').value.trim();
+            localStorage.setItem('examen_realizado_' + zip, 'true');
+            
             activeMissions = [...allMissions].sort(() => 0.5 - Math.random()).slice(0, 5);
-            gameActive = true; currentMission = 0; totalScore = 0;
+            gameActive = true; currentMission = 0; correctAnswers = 0;
             document.getElementById('mission-panel').style.display = 'block';
             window.clearAll(); loadMission();
         }
 
-        async function saveScore(name, score) {
-            if (!name || score <= 0) return;
+        async function saveScore(name, nota) {
+            if (!name) return;
             try {
-                // Guarda el récord en la colección 'records_enlace'
                 await addDoc(collection(db, "records_enlace"), { 
                     name: name.substring(0, 25) || "Anónimo", 
-                    score: score, 
+                    score: nota, 
                     date: new Date() 
                 });
-                alert(`¡Felicidades ${name}! Has conseguido ${score} puntos. Tu récord ha sido guardado en el Salón de la Fama.`);
                 window.toggleRecords();
-            } catch (e) { console.error("Error al guardar récord:", e); }
+            } catch (e) { console.error("Error al guardar nota:", e); }
         }
 
         function loadMission() {
             if (currentMission >= activeMissions.length) { 
                 clearInterval(timer);
-                saveScore(currentStudentName, totalScore);
+                let notaFinal = correctAnswers === 0 ? 1 : correctAnswers;
+                alert(`¡Evaluación Finalizada!\nRespuestas correctas: ${correctAnswers}/5\nNota Final: ${notaFinal}`);
+                saveScore(currentStudentName, notaFinal);
                 window.setMode('libre'); 
                 return; 
             }
@@ -564,9 +583,12 @@
             timer = setInterval(() => {
                 timeLeft--; document.getElementById('time-display').innerText = timeLeft;
                 if (timeLeft <= 0) { 
-                    clearInterval(timer); alert("¡Tiempo agotado!");
-                    saveScore(currentStudentName, totalScore);
-                    window.setMode('libre'); 
+                    clearInterval(timer); 
+                    alert("¡Tiempo agotado para esta pregunta! Pasando a la siguiente...");
+                    currentMission++;
+                    animState = 'idle';
+                    window.clearAll();
+                    loadMission();
                 }
             }, 1000);
         }
