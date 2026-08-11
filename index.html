@@ -5,12 +5,275 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>EnlaceQuest SJ v4.0 — Academia de Enlaces</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+:root{
+  --bg:#0f1220;--panel:#191e31;--panel2:#222942;--text:#eef2ff;--muted:#9aa5c7;
+  --accent:#7aa2f7;--green:#73daca;--yellow:#e0af68;--red:#f7768e;--cyan:#7dcfff;
+  --purple:#bb9af7;--orange:#ff9e64;--shadow:0 12px 35px rgba(0,0,0,.35)
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:radial-gradient(circle at top,#1b2340 0,#0f1220 48%,#0a0c15 100%);
+color:var(--text);font-family:Segoe UI,Roboto,Arial,sans-serif;padding:14px}
+button,input{font:inherit}button{cursor:pointer}
+header,.wrap{width:100%;max-width:1180px;margin:auto}
+header{text-align:center;padding:8px 0 12px}
+h1{margin:0;color:var(--accent);font-size:clamp(1.7rem,4vw,2.5rem)}
+.subtitle{margin:4px 0 12px;color:var(--muted)}
+.topbar{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.btn{border:0;border-radius:11px;padding:10px 14px;font-weight:800;transition:.15s;box-shadow:0 4px 12px rgba(0,0,0,.18)}
+.btn:active{transform:scale(.96)}.btn.primary{background:var(--accent);color:#111827}
+.btn.green{background:var(--green);color:#10151d}.btn.yellow{background:var(--yellow);color:#151515}
+.btn.purple{background:var(--purple);color:#171322}.btn.red{background:var(--red);color:#1b1014}
+.btn.dark{background:var(--panel2);color:var(--text);border:1px solid #3a4568}
+.hidden{display:none!important}
+.panel{background:linear-gradient(145deg,rgba(34,41,66,.94),rgba(20,24,40,.96));
+border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:16px;box-shadow:var(--shadow);margin-bottom:14px}
+.hero{display:grid;grid-template-columns:1.2fr .8fr;gap:14px}
+@media(max-width:800px){.hero{grid-template-columns:1fr}}
+.profile{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center}
+.avatar{width:58px;height:58px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,var(--accent),var(--purple));font-size:1.5rem}
+.name{font-weight:900;font-size:1.15rem}.level{color:var(--yellow);font-weight:800}
+.xpbar{height:11px;background:#101522;border-radius:20px;overflow:hidden;margin-top:7px}
+.xpfill{height:100%;background:linear-gradient(90deg,var(--accent),var(--purple));width:0%;transition:.4s}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.stat{background:#121728;border-radius:12px;padding:10px;text-align:center}
+.stat b{display:block;font-size:1.2rem;color:var(--green)}.stat small{color:var(--muted)}
+.section-title{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:12px}
+.section-title h2,.section-title h3{margin:0}
+.tabs{display:flex;gap:7px;overflow:auto;padding-bottom:4px}
+.tab{white-space:nowrap;border:1px solid #3a4568;background:#171d30;color:var(--muted);padding:9px 13px;border-radius:10px;font-weight:800}
+.tab.active{background:var(--accent);color:#10131c}
+.view{display:none}.view.active{display:block}
+.progress-map{display:grid;grid-template-columns:repeat(5,1fr);gap:9px}
+@media(max-width:650px){.progress-map{grid-template-columns:repeat(2,1fr)}}
+.node{position:relative;background:#13192a;border:1px solid #33405f;border-radius:13px;padding:12px;min-height:105px}
+.node.locked{opacity:.45;filter:saturate(.4)}.node.done{border-color:var(--green)}
+.node .icon{font-size:1.5rem}.node strong{display:block;margin-top:5px}.node small{color:var(--muted)}
+.lock{position:absolute;right:9px;top:8px;color:var(--yellow)}
+.challenge{background:linear-gradient(135deg,#252e50,#1a2038);border:1px solid #44537f;border-radius:15px;padding:16px}
+.challenge .target{font-size:1.35rem;font-weight:900;color:white;margin:5px 0 12px}
+.challenge .hint{color:var(--muted);font-size:.9rem}
+.choices{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;margin-top:12px}
+.choice{background:#151b2d;border:2px solid #34405f;color:white;border-radius:12px;padding:13px;text-align:left;font-weight:800}
+.choice:hover{border-color:var(--accent);background:#1d2741}.choice.correct{border-color:var(--green);background:rgba(115,218,202,.13)}
+.choice.wrong{border-color:var(--red);background:rgba(247,118,142,.1)}
+.feedback{margin-top:12px;padding:12px;border-radius:11px;background:#121728;color:var(--muted)}
+.feedback b{color:white}
+.streak{color:var(--yellow);font-weight:900}
+.labgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:850px){.labgrid{grid-template-columns:1fr}}
+.atom-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:7px}
+@media(max-width:500px){.atom-grid{grid-template-columns:repeat(4,1fr)}}
+.atom{background:#151b2d;border:2px solid transparent;border-radius:10px;color:white;padding:8px 4px;text-align:center;min-height:67px}
+.atom:hover{border-color:var(--accent);transform:translateY(-1px)}
+.atom strong{display:block;font-size:1.1rem;color:var(--cyan)}.atom.metal strong{color:var(--red)}
+.atom small{color:var(--muted);font-size:.68rem}.atom.locked{opacity:.32;cursor:not-allowed}
+.slots{display:flex;justify-content:center;gap:7px;align-items:center;flex-wrap:wrap;margin:14px 0}
+.slot{width:58px;height:58px;border:2px dashed #536080;border-radius:50%;display:grid;place-items:center;background:#101522;font-weight:900;color:#65718f}
+.slot.filled{border-style:solid;border-color:var(--accent);color:white;background:#202941}
+.eq{font-size:1.5rem;text-align:center;background:#101522;border-radius:11px;padding:10px;margin:10px 0;color:var(--accent);font-weight:900}
+canvas{display:block;width:100%;max-width:500px;height:260px;margin:auto;background:#0d111c;border-radius:13px;border:1px solid #35415f}
+.info{background:#101522;border-left:4px solid var(--accent);padding:12px;border-radius:10px;margin-top:12px}
+.info div{margin:6px 0}.label{color:var(--accent);font-weight:800;display:inline-block;min-width:110px}
+.badge{display:inline-block;border-radius:20px;padding:5px 10px;font-size:.78rem;font-weight:900}
+.ionic{background:rgba(247,118,142,.15);color:var(--red)}.polar{background:rgba(224,175,104,.15);color:var(--yellow)}
+.apolar{background:rgba(125,207,255,.15);color:var(--cyan)}
+.toast{position:fixed;left:50%;bottom:22px;transform:translate(-50%,120px);background:#202942;border:1px solid #52638d;padding:13px 18px;border-radius:12px;box-shadow:var(--shadow);z-index:50;transition:.3s;max-width:92%;text-align:center}
+.toast.show{transform:translate(-50%,0)}.toast.good{border-color:var(--green)}.toast.bad{border-color:var(--red)}
+.modal{position:fixed;inset:0;background:rgba(4,6,12,.78);z-index:40;display:grid;place-items:center;padding:16px}
+.modal-card{max-width:600px;width:100%;max-height:90vh;overflow:auto}
+input.code{width:100%;padding:13px;border:1px solid #3e4b70;border-radius:10px;background:#0e1321;color:white;text-align:center;margin:10px 0}
+.reward{display:flex;align-items:center;gap:10px;padding:11px;background:#111728;border-radius:11px;margin:7px 0}
+.reward i{color:var(--yellow);font-size:1.3rem}.reward.done i{color:var(--green)}
+.quest-list{display:grid;gap:8px}.quest{padding:11px;border-radius:10px;background:#121829;border-left:4px solid var(--purple)}
+.quest.done{border-left-color:var(--green);opacity:.75}.quest small{color:var(--muted)}
+.leader li{list-style:none;background:#121829;margin:7px 0;padding:11px;border-radius:10px;display:flex;justify-content:space-between}
+ul.leader{padding:0}.note{color:var(--muted);font-size:.88rem}
+.timer{font-size:1.4rem;color:var(--yellow);font-weight:900}
+.pillrow{display:flex;gap:6px;flex-wrap:wrap}.pill{background:#101522;padding:6px 9px;border-radius:20px;color:var(--muted);font-size:.78rem}
+@keyframes pop{0%{transform:scale(.8);opacity:0}100%{transform:scale(1);opacity:1}}
+.pop{animation:pop .25s}
+</style>
 <meta name="theme-color" content="#07111f">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="format-detection" content="telephone=no">
-  <link rel="stylesheet" href="styles.css">
+<style id="mobile-optimization">
+/* ===== MOBILE FIRST ===== */
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{font-size:16px;overflow-x:hidden;overscroll-behavior-x:none}
+body{
+  margin:0;
+  width:100%;
+  min-width:0;
+  overflow-x:hidden;
+  -webkit-text-size-adjust:100%;
+  touch-action:manipulation;
+  padding-bottom:env(safe-area-inset-bottom);
+}
+button,a,input,select,textarea{font:inherit}
+button{touch-action:manipulation}
+img,svg,canvas{max-width:100%;height:auto}
+.container,.app,.shell,.main,.content,.page{max-width:100%;min-width:0}
+pre,code{max-width:100%;overflow-x:auto}
+.table-wrap,.overflow-x{max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
+
+@media (max-width: 700px){
+  html{font-size:15px}
+  body{font-size:15px}
+
+  header,.header,.topbar,.navbar{
+    position:sticky;
+    top:0;
+    z-index:100;
+  }
+
+  /* Reduce desktop spacing */
+  .container,.app,.shell,.main,.content,.page{
+    width:100%!important;
+    padding-left:12px!important;
+    padding-right:12px!important;
+    margin-left:auto;
+    margin-right:auto;
+  }
+
+  /* Cards */
+  .card,.panel,.box,.challenge,.mission,.target-card{
+    border-radius:16px;
+    padding:14px!important;
+  }
+
+  /* Touch-friendly controls */
+  button,.btn,.choice,.tab,[role="button"]{
+    min-height:46px;
+  }
+
+  .choice{
+    width:100%;
+    min-height:52px;
+    margin:6px 0;
+    padding:12px 14px;
+    text-align:left;
+    line-height:1.3;
+    font-size:16px;
+    border-radius:13px;
+  }
+
+  .choices{
+    display:grid!important;
+    grid-template-columns:1fr!important;
+    gap:8px!important;
+    width:100%;
+  }
+
+  /* Prevent oversized headings from overflowing */
+  h1{font-size:1.65rem!important;line-height:1.1}
+  h2{font-size:1.35rem!important}
+  h3{font-size:1.15rem!important}
+  .target{font-size:1.12rem!important;line-height:1.45}
+  .note,.hint,.feedback{line-height:1.4}
+
+  /* Bottom navigation when tabs exist */
+  .tabs,.nav-tabs,.bottom-nav{
+    gap:4px!important;
+    overflow-x:auto;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+  }
+  .tabs::-webkit-scrollbar,.nav-tabs::-webkit-scrollbar,.bottom-nav::-webkit-scrollbar{display:none}
+  .tab{
+    flex:1 0 auto;
+    min-width:76px;
+    padding:9px 8px!important;
+    white-space:nowrap;
+  }
+
+  /* Grid collapse */
+  .grid,.dashboard-grid,.stats-grid,.cards-grid{
+    grid-template-columns:1fr!important;
+  }
+  .two-col,.two-columns{
+    grid-template-columns:1fr!important;
+  }
+
+  /* Chemistry / atom controls */
+  .atom-grid,.element-grid,.periodic-grid{
+    grid-template-columns:repeat(4,minmax(0,1fr))!important;
+    gap:6px!important;
+  }
+  .atom-card,.element-card{
+    min-height:64px;
+    padding:7px 4px!important;
+  }
+
+  /* Avoid horizontal overflow in formula / lab areas */
+  .slots,.formula,.molecule,.lab-area{
+    max-width:100%;
+    overflow-x:auto;
+  }
+
+  /* Modals fit small phones */
+  .modal,.dialog,.popup{
+    width:calc(100% - 20px)!important;
+    max-width:520px!important;
+    max-height:calc(100dvh - 24px);
+    overflow:auto;
+  }
+
+  /* Safe area for iPhones */
+  .bottom-nav,.fixed-bottom{
+    padding-bottom:calc(8px + env(safe-area-inset-bottom));
+  }
+
+  /* Toast should not cover answer buttons */
+  #toast,.toast{
+    max-width:calc(100vw - 24px);
+    left:50%!important;
+    right:auto!important;
+    transform:translateX(-50%);
+    bottom:calc(14px + env(safe-area-inset-bottom));
+  }
+}
+
+@media (max-width:380px){
+  html{font-size:14px}
+  .container,.app,.shell,.main,.content,.page{
+    padding-left:9px!important;
+    padding-right:9px!important;
+  }
+  .choice{font-size:15px;min-height:50px}
+  .atom-grid,.element-grid,.periodic-grid{
+    grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  }
+}
+
+@media (min-width:701px) and (max-width:1000px){
+  .choices{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+
+/* Respect reduced-motion preference */
+@media (prefers-reduced-motion:reduce){
+  *,*:before,*:after{
+    animation-duration:.01ms!important;
+    animation-iteration-count:1!important;
+    transition-duration:.01ms!important;
+    scroll-behavior:auto!important;
+  }
+}
+</style>
+
+<style id="mobile-performance">
+@media (max-width:700px){
+  .glass,.glass-card,.card{
+    backdrop-filter:none!important;
+    -webkit-backdrop-filter:none!important;
+  }
+  .glow,.neon,.shadow-heavy{
+    box-shadow:0 4px 14px rgba(0,0,0,.16)!important;
+  }
+}
+</style>
 </head>
 <body>
 <header>
@@ -165,6 +428,790 @@
   </div>
 </div>
 
-  <script src="app.js" defer></script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+import { getFirestore, collection, addDoc, getDocs, query, orderBy, limit, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+
+const firebaseConfig={
+  apiKey:"AIzaSyCw4JnCCFHVogAEXncodxi9jnwigO7qUIA",
+  authDomain:"quimicaquest.firebaseapp.com",
+  projectId:"quimicaquest",
+  storageBucket:"quimicaquest.firebasestorage.app",
+  messagingSenderId:"796534851347",
+  appId:"1:796534851347:web:ae85716a8b612d889b3ce6"
+};
+const app=initializeApp(firebaseConfig),db=getFirestore(app);
+
+/* =========================
+   DATOS PEDAGÓGICOS
+========================= */
+const ELEMENTS={
+ H:{name:"Hidrógeno",en:2.1,type:"nonmetal",color:"#fff",ox:"+1,-1"},
+ O:{name:"Oxígeno",en:3.5,type:"nonmetal",color:"#bb9af7",ox:"-2"},
+ Na:{name:"Sodio",en:.9,type:"metal",color:"#f7768e",ox:"+1"},
+ Cl:{name:"Cloro",en:3.1,type:"nonmetal",color:"#1abc9c",ox:"-1,+1,+3,+5,+7"},
+ C:{name:"Carbono",en:2.5,type:"nonmetal",color:"#9ece6a",ox:"±4,+2"},
+ N:{name:"Nitrógeno",en:3,type:"nonmetal",color:"#7aa2f7",ox:"±3,+5"},
+ Mg:{name:"Magnesio",en:1.2,type:"metal",color:"#ff9e64",ox:"+2"},
+ Ca:{name:"Calcio",en:1,type:"metal",color:"#ffb86c",ox:"+2"},
+ K:{name:"Potasio",en:.8,type:"metal",color:"#ff7a7a",ox:"+1"},
+ S:{name:"Azufre",en:2.5,type:"nonmetal",color:"#50fa7b",ox:"-2,+4,+6"},
+ F:{name:"Flúor",en:4,type:"nonmetal",color:"#7dcfff",ox:"-1"},
+ Br:{name:"Bromo",en:2.8,type:"nonmetal",color:"#e74c3c",ox:"-1,+1,+3,+5"},
+ I:{name:"Yodo",en:2.5,type:"nonmetal",color:"#9b59b6",ox:"-1,+1,+5,+7"},
+ Al:{name:"Aluminio",en:1.5,type:"metal",color:"#bfc9ca",ox:"+3"},
+ Fe:{name:"Hierro",en:1.8,type:"metal",color:"#e67e22",ox:"+2,+3"},
+ Cu:{name:"Cobre",en:1.9,type:"metal",color:"#f39c12",ox:"+1,+2"},
+ Zn:{name:"Zinc",en:1.6,type:"metal",color:"#aab7b8",ox:"+2"},
+ Ag:{name:"Plata",en:1.9,type:"metal",color:"#c0c0c0",ox:"+1"},
+ Si:{name:"Silicio",en:1.8,type:"nonmetal",color:"#7f8c8d",ox:"±4"},
+ P:{name:"Fósforo",en:2.1,type:"nonmetal",color:"#f1fa8c",ox:"±3,+5"}
+};
+
+const COMPOUNDS={
+ H2O:{name:"Agua",group:"Óxido de hidrógeno",props:"Molécula polar; esencial para la vida.",level:1},
+ HCl:{name:"Ácido clorhídrico",group:"Hidrácido",props:"Ácido fuerte en disolución acuosa.",level:1},
+ NaCl:{name:"Cloruro de sodio",group:"Sal haloidea",props:"Sólido iónico cristalino; sal de mesa.",level:1},
+ O2:{name:"Oxígeno molecular",group:"Diatómico",props:"Gas esencial para la respiración y combustión.",level:1},
+ CO2:{name:"Dióxido de carbono",group:"Óxido ácido",props:"Gas molecular; participa en el ciclo del carbono.",level:2},
+ NH3:{name:"Amoníaco",group:"Hidruro covalente",props:"Molécula polar; base de Brønsted-Lowry en agua.",level:2},
+ CH4:{name:"Metano",group:"Hidruro covalente",props:"Molécula apolar; componente principal del gas natural.",level:2},
+ MgO:{name:"Óxido de magnesio",group:"Óxido básico",props:"Compuesto iónico de metal y oxígeno.",level:2},
+ CaO:{name:"Óxido de calcio",group:"Óxido básico",props:"Óxido básico; conocido como cal viva.",level:2},
+ H2S:{name:"Ácido sulfhídrico",group:"Hidrácido",props:"Compuesto molecular de hidrógeno y azufre.",level:2},
+ NaOH:{name:"Hidróxido de sodio",group:"Hidróxido",props:"Base fuerte; compuesto iónico.",level:3},
+ CaCl2:{name:"Cloruro de calcio",group:"Sal haloidea",props:"Sal iónica formada por Ca²⁺ y Cl⁻.",level:3},
+ Al2O3:{name:"Óxido de aluminio",group:"Óxido anfótero",props:"Sólido muy duro; estructura de red.",level:3},
+ Fe2O3:{name:"Óxido de hierro(III)",group:"Óxido metálico",props:"Sólido rojizo; mineral hematita.",level:3},
+ CuO:{name:"Óxido de cobre(II)",group:"Óxido metálico",props:"Sólido negro; contiene Cu²⁺ y O²⁻.",level:3},
+ SO2:{name:"Dióxido de azufre",group:"Óxido ácido",props:"Molécula polar; relacionado con lluvia ácida.",level:3},
+ O3:{name:"Ozono",group:"Alótropo",props:"Tres átomos de oxígeno; participa en la capa de ozono.",level:3},
+ KCl:{name:"Cloruro de potasio",group:"Sal haloidea",props:"Sal iónica usada, entre otros, como fertilizante.",level:4},
+ MgCl2:{name:"Cloruro de magnesio",group:"Sal haloidea",props:"Sal iónica con Mg²⁺ y dos Cl⁻.",level:4},
+ FeCl3:{name:"Cloruro de hierro(III)",group:"Sal haloidea",props:"Sal iónica con Fe³⁺ y Cl⁻.",level:4},
+ CuCl2:{name:"Cloruro de cobre(II)",group:"Sal haloidea",props:"Sal iónica de cobre(II).",level:4},
+ CaCO3:{name:"Carbonato de calcio",group:"Oxisal",props:"Presente en caliza, mármol y conchas.",level:5},
+ Na2CO3:{name:"Carbonato de sodio",group:"Oxisal",props:"Sal con ion carbonato; usada industrialmente.",level:5},
+ NaHCO3:{name:"Bicarbonato de sodio",group:"Oxisal ácida",props:"Sal ácida; usada como leudante.",level:5},
+ KNO3:{name:"Nitrato de potasio",group:"Oxisal",props:"Sal con ion nitrato; también es fertilizante.",level:5},
+ CaSO4:{name:"Sulfato de calcio",group:"Oxisal",props:"Componente principal del yeso mineral.",level:6},
+ MgSO4:{name:"Sulfato de magnesio",group:"Oxisal",props:"Sal con ion sulfato.",level:6},
+ Na3PO4:{name:"Fosfato de sodio",group:"Oxisal",props:"Sal con ion fosfato.",level:6},
+ SiO2:{name:"Dióxido de silicio",group:"Óxido ácido",props:"Componente importante de arena, cuarzo y vidrio.",level:6},
+ NaH:{name:"Hidruro de sodio",group:"Hidruro metálico",props:"Compuesto iónico de sodio e hidruro.",level:6},
+ CaH2:{name:"Hidruro de calcio",group:"Hidruro metálico",props:"Hidruro metálico que contiene Ca²⁺ y H⁻.",level:6}
+};
+
+const LEVELS=[
+ {id:1,name:"Primeros enlaces",icon:"🌱",need:0,goal:4,atoms:["H","O","Na","Cl"],compounds:["H2O","HCl","NaCl","O2"]},
+ {id:2,name:"Polaridad",icon:"⚡",need:4,goal:5,atoms:["C","N","Mg","Ca","S"],compounds:["CO2","NH3","CH4","MgO","CaO","H2S"]},
+ {id:3,name:"Iónico vs covalente",icon:"🔥",need:9,goal:6,atoms:["K","F","Al","Fe","Cu"],compounds:["NaOH","CaCl2","Al2O3","Fe2O3","CuO","SO2","O3"]},
+ {id:4,name:"Valencia y proporción",icon:"🧩",need:15,goal:6,atoms:["Zn","Ag","Br","I"],compounds:["KCl","MgCl2","FeCl3","CuCl2"]},
+ {id:5,name:"Iones poliatómicos",icon:"💎",need:21,goal:6,atoms:["P","Si"],compounds:["CaCO3","Na2CO3","NaHCO3","KNO3"]},
+ {id:6,name:"Maestría",icon:"👑",need:27,goal:8,atoms:[],compounds:["CaSO4","MgSO4","Na3PO4","SiO2","NaH","CaH2"]}
+];
+
+const CHALLENGES=[
+ {q:"¿Qué tipo de enlace predomina en NaCl?",a:["Iónico","Covalente polar","Covalente apolar","Metálico"],c:0,e:"Na es metal y Cl no metal; la diferencia de electronegatividad favorece un carácter iónico."},
+ {q:"¿Qué molécula es covalente apolar?",a:["HCl","H₂O","CH₄","NaCl"],c:2,e:"En CH₄ los enlaces C–H tienen una diferencia pequeña y la molécula es globalmente apolar."},
+ {q:"¿Cuál es la fórmula correcta del óxido de calcio?",a:["CaO","Ca₂O","CaO₂","Ca₂O₃"],c:0,e:"Ca trabaja habitualmente como Ca²⁺ y O como O²⁻; se neutralizan 1:1."},
+ {q:"¿Cuál es la fórmula del cloruro de calcio?",a:["CaCl","CaCl₂","Ca₂Cl","Ca₂Cl₃"],c:1,e:"Ca²⁺ necesita dos Cl⁻ para neutralizar la carga total."},
+ {q:"¿Qué elemento atrae con más fuerza los electrones?",a:["Na","C","O","F"],c:3,e:"El flúor tiene la mayor electronegatividad de la lista."},
+ {q:"¿Qué diferencia de EN indica aquí carácter iónico?",a:["0,2","0,5","1,0","2,0"],c:3,e:"En este juego se usa ΔEN > 1,7 como umbral de carácter iónico."},
+ {q:"¿Cuál corresponde al hidróxido de sodio?",a:["NaO","NaOH","Na₂O","NaH"],c:1,e:"El ion hidróxido es OH⁻ y Na⁺ lo neutraliza en proporción 1:1."},
+ {q:"¿Qué compuesto contiene un ion poliatómico?",a:["NaCl","MgO","CaCO₃","H₂"],c:2,e:"CO₃²⁻ es un ion poliatómico: carbonato."},
+ {q:"¿Cuál es la fórmula del sulfato de calcio?",a:["CaSO₃","Ca₂SO₄","CaSO₄","CaS"],c:2,e:"Ca²⁺ y SO₄²⁻ se combinan en proporción 1:1."},
+ {q:"¿Cuál es un óxido ácido?",a:["Na₂O","CaO","SO₂","MgO"],c:2,e:"SO₂ es un óxido de no metal y presenta carácter ácido."}
+];
+
+
+const LEVEL_QUESTIONS={"1":[{"q":"¿Qué tipo de enlace predomina en NaCl?","a":["Iónico","Covalente polar","Covalente apolar","Metálico"],"c":0,"e":"Na es metal y Cl no metal; el carácter predominante es iónico.","id":"m1_1"},{"q":"¿Cuál es la fórmula correcta del agua?","a":["H₂O","HO","H₂O₂","OH"],"c":0,"e":"Dos H y un O forman H₂O.","id":"m1_2"},{"q":"¿Cuál tiene mayor electronegatividad?","a":["H","Na","O","Cl"],"c":2,"e":"En la escala del juego, O = 3,5, mayor que Cl = 3,1.","id":"m1_3"},{"q":"¿Qué enlace predomina entre H y Cl?","a":["Covalente polar","Iónico","Covalente apolar","Metálico"],"c":0,"e":"Ambos son no metales y comparten electrones de forma desigual.","id":"m1_4"},{"q":"¿Cuál es la fórmula del cloruro de sodio?","a":["NaCl","Na₂Cl","NaCl₂","Na₂Cl₂"],"c":0,"e":"Na⁺ y Cl⁻ se neutralizan 1:1.","id":"m1_5"},{"q":"Una diferencia de EN muy pequeña indica principalmente:","a":["Covalente apolar","Iónico","Covalente polar fuerte","Metálico"],"c":0,"e":"La pequeña diferencia favorece una compartición más equilibrada.","id":"m1_6"}],"2":[{"q":"¿Cuál es la fórmula del óxido de magnesio?","a":["MgO","Mg₂O","MgO₂","Mg₂O₃"],"c":0,"e":"Mg²⁺ y O²⁻ se compensan 1:1.","id":"m2_1"},{"q":"¿Cuál es globalmente apolar en el modelo?","a":["CH₄","H₂O","NH₃","HCl"],"c":0,"e":"CH₄ se modela como molécula covalente apolar.","id":"m2_2"},{"q":"¿Qué enlace predomina dentro de NH₃?","a":["Covalente polar","Iónico","Covalente apolar","Metálico"],"c":0,"e":"N y H son no metales con diferencia de EN.","id":"m2_3"},{"q":"¿Cuál es la fórmula del óxido de calcio?","a":["CaO","Ca₂O","CaO₂","Ca₂O₃"],"c":0,"e":"Ca²⁺ y O²⁻ se neutralizan 1:1.","id":"m2_4"},{"q":"¿Cuál es un óxido de no metal?","a":["CO₂","MgO","CaO","Na₂O"],"c":0,"e":"El carbono es no metal.","id":"m2_5"},{"q":"¿Cuál pareja tiene mayor diferencia de EN?","a":["Na–Cl","C–H","H–H","C–C"],"c":0,"e":"Na–Cl presenta una diferencia mucho mayor.","id":"m2_6"}],"3":[{"q":"¿Cuál es la fórmula del óxido de aluminio?","a":["Al₂O₃","AlO","AlO₂","Al₃O₂"],"c":0,"e":"Al³⁺ y O²⁻ requieren proporción 2:3.","id":"m3_1"},{"q":"¿Cuál es principalmente iónico?","a":["CaCl₂","CO₂","SO₂","CH₄"],"c":0,"e":"Ca es metal y Cl no metal.","id":"m3_2"},{"q":"¿Cuál es el óxido de hierro(III)?","a":["Fe₂O₃","FeO","Fe₃O₂","FeO₃"],"c":0,"e":"Dos Fe³⁺ compensan tres O²⁻.","id":"m3_3"},{"q":"¿Qué proporción mínima forma CuO?","a":["1 Cu : 1 O","1 Cu : 2 O","2 Cu : 1 O","2 Cu : 3 O"],"c":0,"e":"Cu²⁺ y O²⁻ se compensan 1:1.","id":"m3_4"},{"q":"¿Cuál es la fórmula del dióxido de azufre?","a":["SO₂","SO","S₂O","S₂O₃"],"c":0,"e":"Di- indica dos oxígenos.","id":"m3_5"},{"q":"¿Qué ΔEN supera el umbral iónico usado?","a":["Na–Cl = 2,2","C–H = 0,4","H–Cl = 1,0","C–O = 1,0"],"c":0,"e":"El juego usa ΔEN > 1,7 como referencia de carácter iónico.","id":"m3_6"}],"4":[{"q":"¿Cuál es la fórmula del cloruro de magnesio?","a":["MgCl₂","MgCl","Mg₂Cl","Mg₂Cl₃"],"c":0,"e":"Mg²⁺ requiere dos Cl⁻.","id":"m4_1"},{"q":"¿Cuál es la fórmula del cloruro de hierro(III)?","a":["FeCl₃","FeCl₂","Fe₃Cl","Fe₂Cl₃"],"c":0,"e":"Fe³⁺ requiere tres Cl⁻.","id":"m4_2"},{"q":"Si M²⁺ se combina con O²⁻, la fórmula mínima es:","a":["MO","M₂O","MO₂","M₂O₃"],"c":0,"e":"Las cargas se compensan 1:1.","id":"m4_3"},{"q":"¿Qué explica CuCl₂?","a":["Cu²⁺ + 2Cl⁻","Cu⁺ + Cl₂⁻","2Cu²⁺ + Cl⁻","Cu³⁺ + 2Cl⁻"],"c":0,"e":"Dos cloruros de -1 compensan Cu²⁺.","id":"m4_4"},{"q":"¿Qué proporción neutraliza Al³⁺ con O²⁻?","a":["2 Al : 3 O","1 Al : 1 O","3 Al : 2 O","1 Al : 3 O"],"c":0,"e":"El mínimo común múltiplo de 3 y 2 es 6.","id":"m4_5"},{"q":"¿Cuál corresponde a bromuro de plata(I)?","a":["AgBr","AgBr₂","Ag₂Br","Ag₂Br₃"],"c":0,"e":"Ag⁺ y Br⁻ se combinan 1:1.","id":"m4_6"}],"5":[{"q":"¿Qué ion poliatómico aparece en CaCO₃?","a":["CO₃²⁻","SO₄²⁻","NO₃⁻","PO₄³⁻"],"c":0,"e":"CO₃²⁻ es carbonato.","id":"m5_1"},{"q":"¿Cuál es la fórmula del carbonato de sodio?","a":["Na₂CO₃","NaCO₃","NaCO₂","Na₃CO₃"],"c":0,"e":"Dos Na⁺ compensan CO₃²⁻.","id":"m5_2"},{"q":"¿Cuál es la fórmula del bicarbonato de sodio?","a":["NaHCO₃","Na₂CO₃","NaHCO₂","Na₂HCO₃"],"c":0,"e":"HCO₃⁻ se combina 1:1 con Na⁺.","id":"m5_3"},{"q":"¿Cuál contiene nitrato?","a":["KNO₃","KCl","CaSO₄","Na₂CO₃"],"c":0,"e":"NO₃⁻ es nitrato.","id":"m5_4"},{"q":"¿Cuál es la fórmula del fosfato de sodio?","a":["Na₃PO₄","NaPO₄","Na₂PO₄","Na₃PO₃"],"c":0,"e":"PO₄³⁻ requiere tres Na⁺.","id":"m5_5"},{"q":"¿Qué pareja contiene dos iones poliatómicos?","a":["CaCO₃ y Na₃PO₄","NaCl y MgO","H₂O y CH₄","KCl y NaH"],"c":0,"e":"CO₃²⁻ y PO₄³⁻ son poliatómicos.","id":"m5_6"}],"6":[{"q":"¿Por qué CaSO₄ es neutro?","a":["Ca²⁺ y SO₄²⁻ se compensan","Ca y S tienen igual EN","SO₄ no tiene carga","Ca aporta cuatro electrones"],"c":0,"e":"+2 + (-2) = 0.","id":"m6_1"},{"q":"¿Qué criterio ayuda a distinguir iónico de covalente?","a":["Tipo de elementos y ΔEN","Número de átomos","Color","Que tenga oxígeno"],"c":0,"e":"Ambos criterios aportan evidencia.","id":"m6_2"},{"q":"¿Cuál fórmula está balanceada para Al³⁺ y SO₄²⁻?","a":["Al₂(SO₄)₃","AlSO₄","Al₃(SO₄)₂","Al₂SO₄"],"c":0,"e":"2×(+3) y 3×(-2) suman cero.","id":"m6_3"},{"q":"¿Cuál exige reconocer un ion poliatómico?","a":["Na₃PO₄","NaCl","MgO","H₂"],"c":0,"e":"PO₄³⁻ es poliatómico.","id":"m6_4"},{"q":"Si X²⁺ se combina con Y³⁻, la fórmula mínima es:","a":["X₃Y₂","XY","X₂Y₃","X₃Y₃"],"c":0,"e":"3×2 = 2×3 = 6.","id":"m6_5"},{"q":"¿Cuál comparación es correcta?","a":["NaCl iónico y CH₄ covalente apolar","Ambos iónicos","NaCl apolar y CH₄ iónico","Ambos metálicos"],"c":0,"e":"NaCl es metal/no metal; CH₄ es una molécula covalente apolar en este modelo.","id":"m6_6"}]};
+const ARENA_QUESTIONS={"1":[{"q":"¿Cuál combinación representa mejor un compuesto iónico?","a":["Metal + no metal","No metal + no metal","H + H","C + H"],"c":0,"e":"Los compuestos metal/no metal suelen presentar carácter iónico.","id":"a1_1"},{"q":"¿Qué debes hacer primero para clasificar un enlace?","a":["Comparar electronegatividades","Contar letras","Mirar el color","Ignorar los elementos"],"c":0,"e":"La diferencia de EN es una herramienta clave.","id":"a1_2"},{"q":"¿Qué especie tiene carga negativa en NaCl?","a":["Cl⁻","Na⁺","Na²⁺","Cl²⁺"],"c":0,"e":"El cloro forma Cl⁻.","id":"a1_3"},{"q":"¿Qué pareja representa electrones compartidos?","a":["H–Cl","Na⁺…Cl⁻","Na²⁺…O²⁻","Ca²⁺…Cl⁻"],"c":0,"e":"H–Cl es un enlace covalente.","id":"a1_4"},{"q":"¿Qué fórmula conserva neutralidad 1:1?","a":["NaCl","NaCl₂","Na₂Cl","Na₂Cl₃"],"c":0,"e":"+1 y -1 se compensan 1:1.","id":"a1_5"},{"q":"¿Cuál es un ejemplo de molécula covalente?","a":["H₂O","NaCl","MgO","CaCl₂"],"c":0,"e":"H₂O está formado solo por no metales.","id":"a1_6"}],"2":[{"q":"¿Qué forma CO₂?","a":["C y O","Ca y O","C y H","N y H"],"c":0,"e":"CO₂ contiene C y O.","id":"a2_1"},{"q":"¿Qué elemento atrae más en H₂O?","a":["O","H","Na","C"],"c":0,"e":"O tiene mayor EN que H.","id":"a2_2"},{"q":"¿Cuál es un enlace covalente polar?","a":["H–O","H–H","Na–Cl","Mg–O"],"c":0,"e":"H–O presenta diferencia de EN entre no metales.","id":"a2_3"},{"q":"¿Qué compuesto tiene enlace metal/no metal?","a":["MgO","CO₂","NH₃","CH₄"],"c":0,"e":"Mg es metal y O no metal.","id":"a2_4"},{"q":"¿Qué fórmula muestra proporción 1:1?","a":["CaO","Ca₂O","CaO₂","Ca₂O₃"],"c":0,"e":"Ca²⁺ y O²⁻ se compensan 1:1.","id":"a2_5"},{"q":"¿Qué molécula tiene varios átomos unidos covalentemente?","a":["NH₃","NaCl","MgO","CaO"],"c":0,"e":"NH₃ está formado por enlaces covalentes.","id":"a2_6"}],"3":[{"q":"¿Por qué Al₂O₃ no es AlO?","a":["Las cargas 3+ y 2− requieren 2:3","Al no reacciona","O no tiene carga","Todos son 1:1"],"c":0,"e":"La neutralidad eléctrica exige 2 Al por 3 O.","id":"a3_1"},{"q":"¿Cuál presenta una razón 2:3 de átomos?","a":["Fe₂O₃","FeO","CuO","SO₂"],"c":0,"e":"Fe₂O₃ tiene dos Fe y tres O.","id":"a3_2"},{"q":"¿Cuál es un óxido ácido?","a":["SO₂","CaO","MgO","Na₂O"],"c":0,"e":"SO₂ es óxido de no metal.","id":"a3_3"},{"q":"¿Qué pareja tiene carácter iónico más marcado?","a":["CaCl₂","CH₄","CO₂","SO₂"],"c":0,"e":"CaCl₂ combina metal y no metal.","id":"a3_4"},{"q":"¿Qué fórmula representa un óxido metálico 1:1?","a":["CuO","Fe₂O₃","SO₂","CO₂"],"c":0,"e":"Cu²⁺ y O²⁻ se compensan 1:1.","id":"a3_5"},{"q":"¿Qué variable explica mejor la polaridad del enlace?","a":["Diferencia de electronegatividad","Número atómico solamente","Masa","Color"],"c":0,"e":"La diferencia de EN determina la desigualdad de compartición.","id":"a3_6"}],"4":[{"q":"¿Qué fórmula resulta de M³⁺ y Cl⁻?","a":["MCl₃","MCl","M₂Cl","M₃Cl₂"],"c":0,"e":"Se necesitan tres Cl⁻.","id":"a4_1"},{"q":"¿Qué fórmula resulta de M²⁺ y Cl⁻?","a":["MCl₂","MCl","M₂Cl","M₂Cl₃"],"c":0,"e":"Se necesitan dos Cl⁻.","id":"a4_2"},{"q":"¿Cuál conserva neutralidad para Fe³⁺ y O²⁻?","a":["Fe₂O₃","FeO","FeO₂","Fe₃O₂"],"c":0,"e":"+6 y -6 se compensan.","id":"a4_3"},{"q":"¿Qué significa la subíndice 3 en FeCl₃?","a":["Hay 3 Cl por cada Fe","Hay 3 Fe por cada Cl","Hay 3 cargas positivas en Fe","Hay 3 moléculas"],"c":0,"e":"El subíndice indica la proporción de átomos/iones.","id":"a4_4"},{"q":"¿Cuál requiere dos aniones por catión?","a":["CuCl₂","AgBr","NaCl","KCl"],"c":0,"e":"Cu²⁺ requiere dos Cl⁻.","id":"a4_5"},{"q":"¿Qué paso evita fórmulas incorrectas?","a":["Cruzar/igualar cargas y simplificar","Elegir subíndices al azar","Usar siempre 2","Ignorar las cargas"],"c":0,"e":"La neutralidad determina la proporción mínima.","id":"a4_6"}],"5":[{"q":"¿Qué ion es carbonato?","a":["CO₃²⁻","SO₄²⁻","NO₃⁻","OH⁻"],"c":0,"e":"CO₃²⁻ es carbonato.","id":"a5_1"},{"q":"¿Qué ion es sulfato?","a":["SO₄²⁻","CO₃²⁻","NO₃⁻","PO₄³⁻"],"c":0,"e":"SO₄²⁻ es sulfato.","id":"a5_2"},{"q":"¿Qué ion es nitrato?","a":["NO₃⁻","CO₃²⁻","SO₄²⁻","PO₄³⁻"],"c":0,"e":"NO₃⁻ es nitrato.","id":"a5_3"},{"q":"¿Qué ion tiene carga 3−?","a":["PO₄³⁻","NO₃⁻","CO₃²⁻","SO₄²⁻"],"c":0,"e":"El fosfato es PO₄³⁻.","id":"a5_4"},{"q":"¿Qué fórmula neutraliza Na⁺ con CO₃²⁻?","a":["Na₂CO₃","NaCO₃","Na₃CO₃","NaCO₂"],"c":0,"e":"Se necesitan dos Na⁺.","id":"a5_5"},{"q":"¿Qué característica define a un ion poliatómico?","a":["Varios átomos con carga neta","Un solo átomo neutro","Un metal puro","Una molécula sin carga siempre"],"c":0,"e":"Es un grupo de átomos que conserva una carga neta.","id":"a5_6"}],"6":[{"q":"¿Qué principio debe cumplirse en toda fórmula neutra?","a":["Carga total = 0","Todos los subíndices = 1","Siempre debe haber O","Debe haber metal"],"c":0,"e":"La neutralidad eléctrica es obligatoria.","id":"a6_1"},{"q":"¿Qué fórmula balancea Al³⁺ con SO₄²⁻?","a":["Al₂(SO₄)₃","AlSO₄","Al₃SO₄","Al(SO₄)₂"],"c":0,"e":"2 Al³⁺ y 3 sulfatos.","id":"a6_2"},{"q":"¿Qué relación balancea X²⁺ y Y³⁻?","a":["3 X : 2 Y","2 X : 3 Y","1:1","3:3"],"c":0,"e":"Ambas cargas llegan a 6 en magnitud.","id":"a6_3"},{"q":"¿Qué evidencia combina mejor para clasificar un enlace?","a":["Tipo de elementos + ΔEN","Solo el nombre","Solo el subíndice","Solo el color"],"c":0,"e":"La naturaleza de los elementos y ΔEN aportan evidencia complementaria.","id":"a6_4"},{"q":"¿Qué error se comete al usar siempre proporción 1:1?","a":["Se ignoran las valencias","Se aumenta la EN","Se elimina el oxígeno","Se cambia el elemento"],"c":0,"e":"No todas las cargas se neutralizan 1:1.","id":"a6_5"},{"q":"¿Cuál conclusión integra mejor el modelo?","a":["La fórmula depende de cargas y la polaridad del ΔEN","La fórmula depende del color","Todos los compuestos son iónicos","Todos los enlaces son apolares"],"c":0,"e":"Son dos ideas centrales del sistema.","id":"a6_6"}]};
+const LAB_QUESTIONS={"1":[{"q":"Para formar agua en el laboratorio debes seleccionar:","a":["H + O","Na + Cl","C + O","H + Cl"],"c":0,"e":"H₂O está formado por H y O.","id":"l1_1"},{"q":"Para formar NaCl selecciona:","a":["Na + Cl","Na + O","H + Cl","C + O"],"c":0,"e":"NaCl es sodio + cloro.","id":"l1_2"},{"q":"Para investigar HCl selecciona:","a":["H + Cl","H + O","Na + Cl","C + O"],"c":0,"e":"HCl contiene H y Cl.","id":"l1_3"},{"q":"¿Qué combinación tiene solo no metales?","a":["H + O","Na + Cl","Na + O","Na + H"],"c":0,"e":"H y O son no metales.","id":"l1_4"},{"q":"¿Qué producto corresponde a 2 H + 1 O?","a":["H₂O","HO","H₂O₂","OH"],"c":0,"e":"La proporción 2:1 corresponde a agua.","id":"l1_5"},{"q":"¿Qué debes revisar antes de sintetizar?","a":["Los elementos y su proporción","Solo el color","Solo el número de tubos","Nada"],"c":0,"e":"La selección y proporción son esenciales.","id":"l1_6"}],"2":[{"q":"Para formar MgO selecciona:","a":["Mg + O","Mg + Cl","Ca + O","C + O"],"c":0,"e":"MgO contiene Mg y O.","id":"l2_1"},{"q":"Para investigar CO₂ selecciona:","a":["C + O","C + H","N + H","Ca + O"],"c":0,"e":"CO₂ contiene C y O.","id":"l2_2"},{"q":"Para investigar NH₃ selecciona:","a":["N + H","N + O","Na + H","N + Cl"],"c":0,"e":"NH₃ contiene N y H.","id":"l2_3"},{"q":"Para formar CH₄ necesitas:","a":["C + H","C + O","N + H","Ca + O"],"c":0,"e":"CH₄ contiene C y H.","id":"l2_4"},{"q":"¿Qué pareja produce un óxido metálico?","a":["Ca + O","C + O","N + H","H + Cl"],"c":0,"e":"Ca es metal y O no metal.","id":"l2_5"},{"q":"¿Qué pareja produce un óxido de no metal?","a":["C + O","Mg + O","Ca + O","Na + O"],"c":0,"e":"C es no metal.","id":"l2_6"}],"3":[{"q":"Para investigar Al₂O₃ selecciona:","a":["Al + O","Al + Cl","Fe + O","Cu + O"],"c":0,"e":"Al y O forman Al₂O₃.","id":"l3_1"},{"q":"Para investigar Fe₂O₃ selecciona:","a":["Fe + O","Fe + Cl","Fe + H","Cu + O"],"c":0,"e":"Fe₂O₃ es óxido de hierro(III).","id":"l3_2"},{"q":"Para investigar CuO selecciona:","a":["Cu + O","Cu + Cl","Cu + H","Cu + S"],"c":0,"e":"CuO contiene Cu y O.","id":"l3_3"},{"q":"Para investigar SO₂ selecciona:","a":["S + O","S + H","S + Cl","C + O"],"c":0,"e":"SO₂ contiene S y O.","id":"l3_4"},{"q":"Si seleccionas Al y O, la proporción mínima correcta es:","a":["2 Al : 3 O","1:1","3 Al : 2 O","1:3"],"c":0,"e":"Al³⁺ y O²⁻ requieren 2:3.","id":"l3_5"},{"q":"¿Qué debes evitar al construir óxidos?","a":["Elegir subíndices al azar","Revisar cargas","Simplificar proporciones","Identificar valencias"],"c":0,"e":"La fórmula debe respetar las cargas.","id":"l3_6"}],"4":[{"q":"Para MgCl₂ necesitas:","a":["1 Mg + 2 Cl","2 Mg + 1 Cl","1 Mg + 1 Cl","2 Mg + 3 Cl"],"c":0,"e":"Mg²⁺ necesita dos Cl⁻.","id":"l4_1"},{"q":"Para FeCl₃ necesitas:","a":["1 Fe + 3 Cl","3 Fe + 1 Cl","1 Fe + 1 Cl","2 Fe + 3 Cl"],"c":0,"e":"Fe³⁺ necesita tres Cl⁻.","id":"l4_2"},{"q":"Para CuCl₂ necesitas:","a":["1 Cu + 2 Cl","2 Cu + 1 Cl","1 Cu + 1 Cl","2 Cu + 3 Cl"],"c":0,"e":"Cu²⁺ necesita dos Cl⁻.","id":"l4_3"},{"q":"Para AgBr necesitas:","a":["1 Ag + 1 Br","2 Ag + 1 Br","1 Ag + 2 Br","2 Ag + 3 Br"],"c":0,"e":"Ag⁺ y Br⁻ se neutralizan 1:1.","id":"l4_4"},{"q":"Para ZnBr₂ necesitas:","a":["1 Zn + 2 Br","2 Zn + 1 Br","1 Zn + 1 Br","2 Zn + 3 Br"],"c":0,"e":"Zn²⁺ requiere dos Br⁻.","id":"l4_5"},{"q":"¿Qué dato manda la proporción de una sal?","a":["Las cargas/valencias","El color","La masa atómica solamente","El número de tubos"],"c":0,"e":"Las cargas determinan la neutralidad.","id":"l4_6"}],"5":[{"q":"Para CaCO₃ necesitas:","a":["Ca + C + O","Ca + S + O","Na + C + O","K + N + O"],"c":0,"e":"CaCO₃ contiene Ca, C y O.","id":"l5_1"},{"q":"Para Na₂CO₃ necesitas:","a":["Na + C + O","Na + S + O","Na + N + O","Ca + C + O"],"c":0,"e":"Es carbonato de sodio.","id":"l5_2"},{"q":"Para KNO₃ necesitas:","a":["K + N + O","K + C + O","K + S + O","K + Cl"],"c":0,"e":"Es nitrato de potasio.","id":"l5_3"},{"q":"Para NaHCO₃ necesitas:","a":["Na + H + C + O","Na + C + O","H + C","Na + H + O"],"c":0,"e":"El bicarbonato contiene Na, H, C y O.","id":"l5_4"},{"q":"¿Qué debes reconocer en un ion poliatómico?","a":["El grupo y su carga neta","Solo el primer átomo","Solo el oxígeno","Que no tenga carga"],"c":0,"e":"El grupo funciona como una unidad con carga.","id":"l5_5"},{"q":"Para un compuesto con PO₄³⁻ debes controlar especialmente:","a":["La carga 3− y la proporción","Solo el color","Solo la masa","Nada"],"c":0,"e":"La carga del ion determina cuántos cationes se requieren.","id":"l5_6"}],"6":[{"q":"Para representar Al₂(SO₄)₃ debes balancear:","a":["Al³⁺ con SO₄²⁻","Al²⁺ con SO₄⁻","Al⁺ con SO₄³⁻","Al³⁺ con SO₄⁻"],"c":0,"e":"2 Al³⁺ y 3 sulfatos producen carga total cero.","id":"l6_1"},{"q":"La mejor estrategia para una sustancia nueva es:","a":["Identificar cargas y simplificar la proporción","Elegir al azar","Usar siempre 1:1","Copiar otra fórmula"],"c":0,"e":"La neutralidad guía la fórmula.","id":"l6_2"},{"q":"Si X²⁺ se combina con Y³⁻, debes buscar:","a":["3 X + 2 Y","2 X + 3 Y","1 X + 1 Y","3 X + 3 Y"],"c":0,"e":"3×2 = 2×3.","id":"l6_3"},{"q":"¿Qué síntesis exige reconocer un ion poliatómico?","a":["Ca + S + O","Na + Cl","Mg + O","H + H"],"c":0,"e":"CaSO₄ contiene SO₄²⁻.","id":"l6_4"},{"q":"¿Por qué una fórmula neutra debe tener carga total cero?","a":["Porque las cargas positivas y negativas se compensan","Porque todos los átomos son iguales","Porque siempre hay O","Porque siempre hay metal"],"c":0,"e":"La neutralidad eléctrica es la condición del compuesto.","id":"l6_5"},{"q":"Si una combinación no está registrada, ¿qué conviene hacer?","a":["Revisar valencias y proporciones","Aumentar átomos al azar","Cambiar colores","Repetir sin analizar"],"c":0,"e":"El razonamiento químico debe guiar el siguiente intento.","id":"l6_6"}]};
+
+function shuffleArray(arr){
+ const a=[...arr];
+ for(let i=a.length-1;i>0;i--){
+   const j=Math.floor(Math.random()*(i+1));
+   [a[i],a[j]]=[a[j],a[i]];
+ }
+ return a;
+}
+function prepareQuestion(q){
+ const options=shuffleArray(q.a.map((text,index)=>({text,index})));
+ return {...q,options,correctIndex:options.findIndex(x=>x.index===q.c)};
+}
+function getPreparedQuestion(mode,level,lastId){
+ const q=getQuestion(mode,level,lastId);
+ return q;
+}
+function getQuestion(mode,level,lastId){
+ const source=mode==="mission"?LEVEL_QUESTIONS:mode==="arena"?ARENA_QUESTIONS:LAB_QUESTIONS;
+ const pool=source[level]||source[1];
+ let candidates=pool.filter(x=>x.id!==lastId);
+ if(!candidates.length)candidates=pool;
+ return prepareQuestion(candidates[Math.floor(Math.random()*candidates.length)]);
+}
+
+const MOBILE_OPTIMIZED_VERSION="v5.7-mobile";
+const state={
+ slots:[null,null,null,null],xp:0,coins:0,correct:0,streak:0,bestStreak:0,
+ discoveries:new Set(),mastery:{},completedLevels:new Set(),failed:new Set(),
+ name:"Aprendiz de Química",level:1,arenaIndex:0,arenaScore:0,arenaAnswered:false,
+dailyQuestionId:null,arenaQuestionId:null,labQuestionId:null,
+dailyQuestion:null,arenaQuestion:null,labQuestion:null,
+dailyLevel:null,dailyCorrect:0,dailyAsked:[],dailyCompleted:false,dailyQueue:[],dailyIndex:0
+};
+
+function save(){
+ localStorage.setItem("enlacequest_v57",JSON.stringify({
+  ...state,discoveries:[...state.discoveries],completedLevels:[...state.completedLevels]
+ }));
+}
+function load(){
+ try{
+  const x=JSON.parse(localStorage.getItem("enlacequest_v57")||"null");
+  if(!x)return;
+  Object.assign(state,x);
+  state.discoveries=new Set(x.discoveries||[]);
+  state.completedLevels=new Set(x.completedLevels||[]);
+ }catch(e){console.warn(e)}
+}
+function xpForLevel(l){return 100+(l-1)*60}
+function totalMastery(){
+ const total=Object.keys(COMPOUNDS).length;
+ return Math.round((state.discoveries.size/total)*100);
+}
+function currentLevel(){
+ let l=1;
+ for(const x of LEVELS)if(state.xp>=x.need)l=x.id;
+ return Math.min(l,LEVELS.length);
+}
+function addXP(n,reason=""){
+ const oldLevel=state.level;
+ state.xp+=n;
+ state.coins+=Math.max(1,Math.floor(n/4));
+
+ // Recalcula desbloqueos después de modificar XP.
+ syncProgression();
+
+ if(state.level>oldLevel){
+   const chapter=LEVELS[state.level-1];
+   showToast(`🎉 ¡Subiste al nivel ${state.level}! ${chapter.icon} ${chapter.name}`,"good");
+ }
+ if(reason)showToast(`+${n} XP · ${reason}`,"good");
+ save();
+ renderAll();
+}
+
+function awardMissionXP(n,reason=""){
+ const oldLevel=state.level;
+ state.xp+=n;
+ state.coins+=Math.max(1,Math.floor(n/4));
+ syncProgression();
+
+ if(state.level>oldLevel){
+   const chapter=LEVELS[state.level-1];
+   showToast(`🎉 ¡Subiste al nivel ${state.level}! ${chapter.icon} ${chapter.name}`,"good");
+ }
+ if(reason)showToast(`+${n} XP · ${reason}`,"good");
+ save();
+}
+function markFailed(question){
+ if(!state.failed) state.failed=[];
+ if(state.failed instanceof Set) state.failed.add(question);
+ else {
+   if(!Array.isArray(state.failed)) state.failed=[];
+   if(!state.failed.includes(question)) state.failed.push(question);
+ }
+}
+function updateStreak(ok){
+ if(ok){state.streak++;state.bestStreak=Math.max(state.bestStreak,state.streak)}
+ else state.streak=0;
+}
+function showToast(msg,type=""){
+ const t=document.getElementById("toast");t.textContent=msg;t.className=`toast show ${type}`;
+ clearTimeout(window.toastTimer);window.toastTimer=setTimeout(()=>t.className="toast",2600);
+}
+window.showView=function(id){
+ document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
+ document.getElementById(id).classList.add("active");
+ document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("active",t.dataset.view===id));
+ if(id==="perfil")renderProfile();
+ if(id==="desafios")renderArena();
+};
+
+function unlockedLevel(l){
+ if(l===1) return true;
+ return state.completedLevels.has(l-1);
+}
+
+const ELEMENT_UNLOCK_LEVEL={
+ H:1,O:1,Na:1,Cl:1,
+ C:2,N:2,Mg:2,Ca:2,S:2,
+ K:3,F:3,Al:3,Fe:3,Cu:3,
+ Zn:4,Ag:4,Br:4,I:4,
+ P:5,Si:5
+};
+
+function unlockedElements(){
+ const set=new Set();
+ Object.entries(ELEMENT_UNLOCK_LEVEL).forEach(([sym,level])=>{
+   if(unlockedLevel(level)) set.add(sym);
+ });
+ return set;
+}
+
+function syncProgression(){
+ // Automatically marks a chapter as mastered once its required compounds
+ // have been discovered. This makes unlocking deterministic and visible.
+ let changed=true;
+ while(changed){
+   changed=false;
+   LEVELS.forEach(l=>{
+     if(state.completedLevels.has(l.id)) return;
+     const got=l.compounds.filter(c=>state.discoveries.has(c)).length;
+     if(got>=l.goal){
+       state.completedLevels.add(l.id);
+       changed=true;
+     }
+   });
+ }
+ // Visible chapter = highest sequentially unlocked chapter.
+ let level=1;
+ for(let i=2;i<=LEVELS.length;i++){
+   if(unlockedLevel(i)) level=i;
+   else break;
+ }
+ state.level=level;
+ save();
+}
+
+function renderAcademy(){
+ const map=document.getElementById("progressMap");
+ map.innerHTML="";
+ LEVELS.forEach(l=>{
+  const unlocked=unlockedLevel(l.id),done=state.completedLevels.has(l.id);
+  const got=l.compounds.filter(x=>state.discoveries.has(x)).length;
+  const el=document.createElement("div");
+  el.className=`node ${unlocked?"":"locked"} ${done?"done":""}`;
+  el.innerHTML=`<span class="icon">${l.icon}</span>
+   <strong>Cap. ${l.id}: ${l.name}</strong>
+   <small>${done?"✅ Dominado":unlocked?`${got}/${l.goal} descubrimientos`:`🔒 ${l.need} XP + capítulo ${l.id-1}`}</small>
+   ${!unlocked?'<span class="lock">🔒</span>':''}`;
+  map.appendChild(el);
+ });
+ document.getElementById("chapterBadge").textContent=`Capítulo ${state.level}`;
+ renderDaily();
+ renderAcademyQuests();
+ renderAcademyElements();
+}
+
+function renderAcademyQuests(){
+ const box=document.getElementById("academyQuests");
+ if(!box)return;
+ const quests=[
+  {t:"Descubre 4 sustancias",d:"Registra cuatro compuestos válidos en el laboratorio.",n:state.discoveries.size,g:4},
+  {t:"Descubre una sustancia iónica",d:"Por ejemplo: NaCl, MgO o CaCl₂.",n:["NaCl","MgO","CaCl2","KCl"].filter(x=>state.discoveries.has(x)).length,g:1},
+  {t:"Explora moléculas covalentes",d:"Descubre H₂O, HCl, NH₃, CH₄, CO₂ o SO₂.",n:["H2O","HCl","NH3","CH4","CO2","SO2"].filter(x=>state.discoveries.has(x)).length,g:2},
+  {t:"Domina un capítulo",d:"Completa todos los descubrimientos requeridos del capítulo.",n:state.completedLevels.size,g:1},
+  {t:"Consigue una racha de 5",d:"Logra cinco respuestas correctas consecutivas.",n:Math.min(state.bestStreak,5),g:5}
+ ];
+ let doneCount=0;
+ box.innerHTML="";
+ quests.forEach(q=>{
+  const done=q.n>=q.g;if(done)doneCount++;
+  const e=document.createElement("div");
+  e.className=`quest ${done?"done":""}`;
+  e.innerHTML=`<b>${done?"✅":"🎯"} ${q.t}</b>
+   <span style="float:right;font-weight:900;color:${done?"var(--green)":"var(--yellow)"}">${Math.min(q.n,q.g)}/${q.g}</span>
+   <br><small>${q.d}</small>`;
+  box.appendChild(e);
+ });
+ const count=document.getElementById("missionCount");
+ if(count)count.textContent=`${doneCount}/${quests.length}`;
+}
+
+function renderAcademyElements(){
+ const box=document.getElementById("academyElements");
+ if(!box)return;
+ const unlocked=unlockedElements();
+ box.innerHTML="";
+ Object.entries(ELEMENTS).forEach(([sym,d])=>{
+  const p=document.createElement("span");
+  p.className="pill";
+  p.style.border=`1px solid ${unlocked.has(sym)?d.color:"#39445f"}`;
+  p.style.color=unlocked.has(sym)?d.color:"#65718f";
+  p.innerHTML=unlocked.has(sym)?`⚛️ <b>${sym}</b> ${d.name}`:`🔒 ${sym} · bloqueado`;
+  box.appendChild(p);
+ });
+ const count=document.getElementById("academyElementCount");
+ if(count)count.textContent=`${unlocked.size}/${Object.keys(ELEMENTS).length}`;
+
+ const guide=document.getElementById("unlockGuide");
+ if(guide){
+   let next=null;
+   for(let i=1;i<=LEVELS.length;i++){
+     if(!unlockedLevel(i)){ next=LEVELS[i-1]; break; }
+   }
+   if(!next){
+     guide.innerHTML=`<b>👑 ¡Todos los elementos están desbloqueados!</b><br>
+       Has llegado a la zona de maestría. Ahora puedes completar y repetir desafíos.`;
+   }else{
+     const prev=next.id===1?null:LEVELS[next.id-2];
+     const got=prev?prev.compounds.filter(x=>state.discoveries.has(x)).length:0;
+     guide.innerHTML=`<b>🔓 Próximo desbloqueo: Capítulo ${next.id} — ${next.name}</b><br>
+       ${prev?`Necesitas dominar el Capítulo ${prev.id}: <b>${got}/${prev.goal}</b> descubrimientos y alcanzar <b>${next.need} XP</b>.`:
+       "Este capítulo está disponible desde el inicio."}`;
+   }
+ }
+}
+
+function progressLevel(id){
+ return Math.min(LEVELS[id-1].goal,Object.values(state.mastery).filter(x=>x.level===id&&x.ok).length);
+}
+function renderDaily(){
+ const box=document.getElementById("dailyChallenge");
+ if(!box)return;
+
+ const level=Math.min(6,Math.max(1,state.level));
+ const info=LEVELS[level-1];
+
+ // Entering a new level creates a completely new six-question mission.
+ if(state.dailyLevel!==level){
+   state.dailyLevel=level;
+   state.dailyCorrect=0;
+   state.dailyAsked=[];
+   state.dailyQueue=shuffleArray(LEVEL_QUESTIONS[level]||[]).slice(0,6);
+   state.dailyIndex=0;
+   state.dailyQuestion=null;
+   state.dailyQuestionId=null;
+   state.dailyCompleted=false;
+ }
+
+ // Six correct answers = mission complete. Do not generate a seventh question.
+ if(state.dailyCorrect>=6 || state.dailyCompleted){
+   state.dailyCompleted=true;
+   box.innerHTML=`<div class="mission-complete">
+     <div style="font-size:42px">🎉</div>
+     <h3>¡Misión completada!</h3>
+     <p>Has dominado las 6 preguntas del <b>Nivel ${level}</b>.</p>
+     <div class="progress"><div style="width:100%"></div></div>
+     <p class="note">Las nuevas preguntas aparecerán al avanzar al siguiente nivel.</p>
+   </div>`;
+   save();
+   return;
+ }
+
+ // Create the current question only once. The queue guarantees no repetition.
+ if(!state.dailyQuestion){
+   const base=state.dailyQueue[state.dailyIndex];
+   if(!base){
+     // Safety fallback if old localStorage data is incomplete.
+     state.dailyQueue=shuffleArray(LEVEL_QUESTIONS[level]||[]).slice(0,6);
+     state.dailyIndex=0;
+   }
+   state.dailyQuestion=prepareQuestion(state.dailyQueue[state.dailyIndex]);
+   state.dailyQuestion.level=level;
+   state.dailyQuestionId=state.dailyQuestion.id;
+   if(!state.dailyAsked.includes(state.dailyQuestion.id)){
+     state.dailyAsked.push(state.dailyQuestion.id);
+   }
+ }
+
+ const q=state.dailyQuestion;
+
+ box.innerHTML=`<div class="note">🔥 Misión de hoy · Nivel ${level} ${info.icon} ${info.name}</div>
+ <div class="progress"><div style="width:${Math.min(100,(state.dailyCorrect/6)*100)}%"></div></div>
+ <div class="hint">Pregunta ${state.dailyCorrect+1} de 6 · ${state.dailyCorrect} correctas</div>
+ <div class="target">${q.q}</div>
+ <div class="hint">Pregunta ${state.dailyCorrect+1}: no se repetirá en este nivel.</div>
+ <div class="choices">${q.options.map((x,i)=>`<button type="button" class="choice" onclick="window.answerDaily(${i})">${x.text}</button>`).join("")}</div>
+ <div id="dailyFeedback" class="feedback hidden"></div>`;
+ save();
+}
+
+window.answerDaily=function(i){
+ try{
+   const q=state.dailyQuestion;
+   if(!q || !Array.isArray(q.options) || typeof q.correctIndex!=="number")return;
+
+   i=Number(i);
+   if(!Number.isInteger(i)||i<0||i>=q.options.length)return;
+
+   const ok=i===q.correctIndex;
+
+   // Lock this attempt immediately.
+   document.querySelectorAll("#dailyChallenge .choice").forEach((b,j)=>{
+     b.disabled=true;
+     if(j===q.correctIndex)b.classList.add("correct");
+     if(j===i&&!ok)b.classList.add("wrong");
+   });
+
+   const fb=document.getElementById("dailyFeedback");
+   if(fb){
+     fb.classList.remove("hidden");
+     fb.innerHTML=ok
+       ? `<b>✅ ¡Correcto!</b> ${q.e}`
+       : `<b>🔎 Repaso:</b> ${q.e}`;
+   }
+
+   updateStreak(ok);
+
+   if(ok){
+     state.correct++;
+     state.dailyCorrect++;
+
+     // Advance FIRST. The current question can never be rendered again.
+     state.dailyIndex++;
+     state.dailyQuestion=null;
+     state.dailyQuestionId=null;
+
+     // Do NOT call addXP(): it calls renderAll() and can redraw the old UI.
+     awardMissionXP(15,`misión nivel ${q.level}`);
+
+     if(state.dailyCorrect>=6){
+       state.dailyCompleted=true;
+       save();
+     }
+
+     // After feedback, render either the next question or completion screen.
+     setTimeout(()=>{
+       renderDaily();
+     },1400);
+
+   }else{
+     // Incorrect answers do not advance the queue.
+     markFailed(q.q);
+
+     // Give recovery XP without re-rendering the mission.
+     awardMissionXP(4,"recuperación conceptual");
+
+     save();
+
+     // Keep the same question visible; only re-enable choices after feedback.
+     setTimeout(()=>{
+       const buttons=document.querySelectorAll("#dailyChallenge .choice");
+       buttons.forEach(b=>b.disabled=false);
+     },1400);
+   }
+
+ }catch(err){
+   console.error("answerDaily:",err);
+ }
+};
+
+function renderAtoms(){
+ const grid=document.getElementById("atomGrid");
+ if(!grid) return;
+ const unlocked=unlockedElements();
+
+ grid.innerHTML="";
+ Object.entries(ELEMENTS).forEach(([sym,d])=>{
+   const level=ELEMENT_UNLOCK_LEVEL[sym]||1;
+   const ok=unlocked.has(sym);
+   const b=document.createElement("button");
+   b.type="button";
+   b.className=`atom ${d.type} ${ok?"":"locked"}`;
+   b.disabled=!ok;
+   b.title=ok
+     ? `${d.name} · Electronegatividad ${d.en}`
+     : `🔒 Se desbloquea en el Capítulo ${level}`;
+   b.innerHTML=ok
+     ? `<strong>${sym}</strong><small>${d.name}</small><small>EN ${d.en}</small>`
+     : `<strong>🔒</strong><small>${sym}</small><small>Cap. ${level}</small>`;
+   if(ok) b.addEventListener("click",()=>addSlot(sym));
+   grid.appendChild(b);
+ });
+
+ const badge=document.getElementById("unlockBadge");
+ if(badge) badge.textContent=`🔓 ${unlocked.size}/${Object.keys(ELEMENTS).length} elementos`;
+
+ // Always show the starter set, even if a previous save was malformed.
+ if(unlocked.size===0){
+   ["H","O","Na","Cl"].forEach(sym=>{
+     if(!ELEMENTS[sym])return;
+     const d=ELEMENTS[sym],b=document.createElement("button");
+     b.type="button"; b.className=`atom ${d.type}`;
+     b.innerHTML=`<strong>${sym}</strong><small>${d.name}</small><small>EN ${d.en}</small>`;
+     b.onclick=()=>addSlot(sym);
+     grid.appendChild(b);
+   });
+ }
+}
+
+function addSlot(sym){
+ const i=state.slots.findIndex(x=>!x);if(i<0)return showToast("Los 4 tubos están ocupados. Vacía uno.","");
+ state.slots[i]=sym;renderSlots();drawCanvas();
+}
+window.removeSlot=function(i){state.slots[i]=null;renderSlots();hideResult();drawCanvas()}
+window.clearSlots=function(){state.slots=[null,null,null,null];renderSlots();hideResult();drawCanvas()}
+function renderSlots(){
+ state.slots.forEach((x,i)=>{const e=document.getElementById("slot"+(i+1));e.textContent=x||i+1;e.classList.toggle("filled",!!x)});
+ document.getElementById("synthBtn").disabled=state.slots.filter(Boolean).length<2;
+}
+function formulaFromAtoms(atoms){
+ const c={};atoms.forEach(a=>c[a]=(c[a]||0)+1);
+ const syms=Object.keys(c);
+ const metals=syms.filter(s=>ELEMENTS[s].type==="metal"),non=syms.filter(s=>ELEMENTS[s].type==="nonmetal");
+ let order=[];
+ if(metals.length){
+  order=[...metals.sort((a,b)=>ELEMENTS[a].en-ELEMENTS[b].en),...non.filter(x=>x!=="O"&&x!=="H").sort((a,b)=>ELEMENTS[a].en-ELEMENTS[b].en)];
+  if(non.includes("O"))order.push("O");
+  if(non.includes("H")&&non.includes("O"))order.push("H");
+  else if(non.includes("H"))order.push("H");
+ }else{
+  if(non.includes("H")&&non.some(x=>["F","Cl","Br","I","O","S"].includes(x)))order=["H",...non.filter(x=>x!=="H").sort((a,b)=>ELEMENTS[a].en-ELEMENTS[b].en)];
+  else order=non.sort((a,b)=>ELEMENTS[a].en-ELEMENTS[b].en);
+ }
+ let raw="",html="";
+ order.forEach(s=>{if(c[s]){raw+=s+(c[s]>1?c[s]:"");html+=s+(c[s]>1?`<sub>${c[s]}</sub>`:"")}});
+ return {raw,html};
+}
+function bondType(atoms){
+ let max=0;
+ for(let i=0;i<atoms.length-1;i++)max=Math.max(max,Math.abs(ELEMENTS[atoms[i]].en-ELEMENTS[atoms[i+1]].en));
+ return {delta:+max.toFixed(1),type:max>1.7?"ionic":max>.4?"polar":"apolar"};
+}
+window.synthesize=function(){
+ const atoms=state.slots.filter(Boolean);if(atoms.length<2)return;
+ const f=formulaFromAtoms(atoms),b=bondType(atoms);
+ document.getElementById("equation").innerHTML=`${atoms.join(" + ")} → ${f.html}`;
+ document.getElementById("equation").classList.remove("hidden");
+ drawCanvas(true);
+ setTimeout(()=>showCompound(f.raw,b,atoms),500);
+};
+function showCompound(raw,b,atoms){
+ const info=COMPOUNDS[raw];
+ const known=!!info;
+ document.getElementById("result").className="info pop";
+ document.getElementById("result").classList.remove("hidden");
+ document.getElementById("result").innerHTML=`
+  <div style="display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap">
+   <strong style="font-size:1.2rem">🧬 ${raw}</strong>
+   <span class="badge ${b.type}">${b.type==="ionic"?"Carácter iónico":b.type==="polar"?"Covalente polar":"Covalente apolar"}</span>
+  </div>
+  <div><span class="label">ΔEN:</span>${b.delta}</div>
+  <div><span class="label">Nombre:</span>${known?info.name:"Combinación no registrada"}</div>
+  <div><span class="label">Familia:</span>${known?info.group:"Sin clasificar"}</div>
+  <div><span class="label">Idea clave:</span>${known?info.props:"Prueba otra combinación o revisa la proporción de átomos."}</div>`;
+ if(known&&!state.discoveries.has(raw)){
+  state.discoveries.add(raw);state.correct++;state.streak++;state.bestStreak=Math.max(state.bestStreak,state.streak);
+  const bonus=10+(info.level*2);
+  // Registrar descubrimiento → comprobar dominio → XP.
+  // Así el capítulo queda marcado antes de recalcular los desbloqueos.
+  save();
+  checkLevelMastery(info.level);
+  addXP(bonus,`nuevo descubrimiento: ${info.name}`);
+  syncProgression();
+  renderAll();
+ }else if(!known){
+  updateStreak(false);showToast("🧭 Combinación no registrada. Investiga otra ruta.","bad");
+ }
+ save();renderAll();
+}
+function checkLevelMastery(level){
+ const l=LEVELS[level-1];
+ if(!l) return;
+
+ const got=l.compounds.filter(x=>state.discoveries.has(x)).length;
+ if(got>=l.goal && !state.completedLevels.has(level)){
+   // MUY IMPORTANTE: marcar primero como completado.
+   state.completedLevels.add(level);
+   save();
+
+   showToast(`🏆 Capítulo ${level} dominado. ¡Revisa los nuevos elementos!`,"good");
+
+   // El XP de recompensa se entrega después de marcar el capítulo.
+   addXP(30,`capítulo ${level} dominado`);
+
+   // Recalcular todos los desbloqueos inmediatamente.
+   syncProgression();
+   renderAll();
+ }
+}
+function hideResult(){document.getElementById("result").classList.add("hidden");document.getElementById("equation").classList.add("hidden")}
+function drawCanvas(anim=false){
+ const c=document.getElementById("canvas"),ctx=c.getContext("2d");ctx.clearRect(0,0,c.width,c.height);
+ const a=state.slots.filter(Boolean);if(a.length<2)return;
+ const xs=a.length===2?[145,355]:a.length===3?[90,250,410]:[65,190,310,435];
+ a.forEach((s,i)=>{const d=ELEMENTS[s];ctx.beginPath();ctx.arc(xs[i],130,37,0,Math.PI*2);ctx.fillStyle="#202942";ctx.fill();ctx.lineWidth=3;ctx.strokeStyle=d.color;ctx.stroke();ctx.fillStyle="#fff";ctx.font="bold 21px Arial";ctx.textAlign="center";ctx.fillText(s,xs[i],137)});
+ for(let i=0;i<a.length-1;i++){ctx.beginPath();ctx.moveTo(xs[i]+37,130);ctx.lineTo(xs[i+1]-37,130);ctx.strokeStyle="#64749f";ctx.lineWidth=5;ctx.stroke()}
+ ctx.fillStyle="#9aa5c7";ctx.font="14px Arial";ctx.fillText("Representación conceptual del enlace",250,220);
+}
+
+function renderArena(){
+ const box=document.getElementById("arena");
+ const level=Math.min(6,Math.max(1,state.level)),info=LEVELS[level-1];
+ let q=state.arenaQuestion;
+ if(!q || q.level!==level){
+   q=getQuestion("arena",level,state.arenaQuestionId);
+   q.level=level;
+   state.arenaQuestion=q;
+   state.arenaQuestionId=q.id;
+ }
+ box.innerHTML=`<div class="challenge"><div class="note">⚔️ Arena · Nivel ${level} ${info.icon} ${info.name} · Ronda ${state.arenaIndex+1}</div>
+ <div class="target">${q.q}</div><div class="hint">6 preguntas diferentes por nivel · complejidad creciente · respuestas aleatorias.</div>
+ <div class="choices">${q.options.map((x,i)=>`<button type="button" class="choice" onclick="window.answerArena(${i})">${x.text}</button>`).join("")}</div>
+ <div id="arenaFeedback" class="feedback hidden"></div></div>`;
+ save();
+}
+window.answerArena=function(i){
+ if(state.arenaAnswered)return; state.arenaAnswered=true;
+ const level=Math.min(6,Math.max(1,state.level)),q=state.arenaQuestion;
+ if(!q || q.id!==state.arenaQuestionId)return;
+ const ok=i===q.correctIndex;
+ document.querySelectorAll("#arena .choice").forEach((b,j)=>{b.disabled=true;if(j===q.correctIndex)b.classList.add("correct");if(j===i&&!ok)b.classList.add("wrong")});
+ const fb=document.getElementById("arenaFeedback");fb.classList.remove("hidden");
+ fb.innerHTML=ok?`<b>🏆 ¡Dominio!</b> ${q.e}<br><span class="note">+20 XP</span>`:`<b>📚 Repaso obligatorio.</b> ${q.e}<br><span class="note">+5 XP por revisar.</span>`;
+ updateStreak(ok);if(ok){state.correct++;addXP(20,`arena nivel ${level}`)}else{markFailed(q.q);addXP(5,"repaso de arena")}
+ save();renderQuests();
+ setTimeout(()=>{
+   state.arenaIndex++;
+   state.arenaAnswered=false;
+   state.arenaQuestion=null;
+   state.arenaQuestionId=null;
+   renderArena();
+ },1800);
+};
+
+function renderQuests(){
+ renderAcademyQuests();
+ const box=document.getElementById("questList");box.innerHTML="";
+ const quests=[
+  {t:"Descubre 4 sustancias",d:"Registra 4 compuestos en el laboratorio.",n:state.discoveries.size,g:4},
+  {t:"Construye una sal iónica",d:"Descubre NaCl, KCl, MgCl₂, CaCl₂ o similares.",n:["NaCl","KCl","MgCl2","CaCl2"].filter(x=>state.discoveries.has(x)).length,g:1},
+  {t:"Explora la polaridad",d:"Descubre NH₃, H₂O, HCl o SO₂.",n:["NH3","H2O","HCl","SO2"].filter(x=>state.discoveries.has(x)).length,g:2},
+  {t:"Completa un capítulo",d:"Alcanza el número de descubrimientos requerido.",n:state.completedLevels.size,g:1},
+  {t:"Racha de 5",d:"Consigue cinco aciertos consecutivos.",n:Math.min(state.bestStreak,5),g:5}
+ ];
+ quests.forEach(q=>{const done=q.n>=q.g;const e=document.createElement("div");e.className=`quest ${done?"done":""}`;e.innerHTML=`<b>${done?"✅":"🎯"} ${q.t}</b><br><small>${q.d}</small><span style="float:right">${q.n}/${q.g}</span>`;box.appendChild(e)})
+}
+function renderProfile(){
+ const next=currentLevel()<LEVELS.length?LEVELS[currentLevel()].need:LEVELS[LEVELS.length-1].need+100;
+ document.getElementById("profileDetails").innerHTML=`
+  <div class="pillrow">
+   <span class="pill">Nivel ${state.level}</span><span class="pill">🔥 Mejor racha ${state.bestStreak}</span>
+   <span class="pill">🧪 ${state.discoveries.size} descubrimientos</span><span class="pill">🪙 ${state.coins} química</span>
+  </div>
+  <hr style="border-color:#293452;margin:14px 0">
+  <p><b>Dominio global:</b> ${totalMastery()}%</p>
+  <div class="xpbar"><div class="xpfill" style="width:${Math.min(100,(state.xp/(next||1))*100)}%"></div></div>
+  <p class="note">${currentLevel()===LEVELS.length?"👑 Has llegado a la zona de maestría.":`Siguiente desbloqueo importante: ${next} XP.`}</p>`;
+ loadLeaderboard();
+}
+async function loadLeaderboard(){
+ const list=document.getElementById("leaderboard");
+ try{
+  const q=query(collection(db,"records_enlace"),orderBy("score","desc"),limit(20)),snap=await getDocs(q);
+  list.innerHTML="";
+  if(snap.empty){list.innerHTML="<li>Aún no hay registros.</li>";return}
+  let i=1;snap.forEach(d=>{const r=d.data();const li=document.createElement("li");li.innerHTML=`<span>${i===1?"🥇":i===2?"🥈":i===3?"🥉":"#"+i} ${r.name||"Estudiante"}</span><b>${r.score}</b>`;list.appendChild(li);i++})
+ }catch(e){list.innerHTML="<li>No se pudo cargar el ranking.</li>"}
+}
+window.resetLocalProgress=function(){
+ if(confirm("¿Reiniciar todo el progreso de este dispositivo?")){
+  localStorage.removeItem("enlacequest_v57");location.reload();
+ }
+};
+
+/* =========================
+   EVALUACIÓN FORMAL
+========================= */
+const EXAM=[
+ {text:"Construye Agua (H₂O).",formula:"H2O"},
+ {text:"Construye Cloruro de Sodio (NaCl).",formula:"NaCl"},
+ {text:"Construye Dióxido de Carbono (CO₂).",formula:"CO2"},
+ {text:"Construye Amoníaco (NH₃).",formula:"NH3"},
+ {text:"Construye Óxido de Calcio (CaO).",formula:"CaO"}
+];
+let exam={active:false,i:0,correct:0,name:"",zip:""};
+window.openLogin=()=>document.getElementById("loginModal").classList.remove("hidden");
+window.closeLogin=()=>document.getElementById("loginModal").classList.add("hidden");
+window.validateZip=async function(){
+ const zip=document.getElementById("zipInput").value.trim(),err=document.getElementById("loginError");
+ if(!zip){err.textContent="Ingresa tu código.";return}
+ if(localStorage.getItem("examen_v4_"+zip)){err.textContent="Esta evaluación ya fue presentada.";return}
+ try{
+  const s=await getDoc(doc(db,"estudiantes",zip));
+  if(!s.exists()){err.textContent="Código no encontrado.";return}
+  const d=s.data();exam={active:true,i:0,correct:0,name:d.nombre||`${d["First Name"]||""} ${d["Last Name"]||""}`.trim()||"Estudiante",zip};
+  localStorage.setItem("examen_v4_"+zip,"1");closeLogin();startExam();
+ }catch(e){err.textContent="Error de conexión con Firebase."}
+};
+function startExam(){
+ showView("laboratorio");showToast(`🎯 Evaluación iniciada: ${exam.name}`);
+ const oldSynth=window.synthesize;
+ window.__oldSynth=oldSynth;
+ window.synthesize=function(){
+  const atoms=state.slots.filter(Boolean);if(atoms.length<2)return;
+  const f=formulaFromAtoms(atoms);
+  oldSynth();
+  setTimeout(()=>{
+   if(!exam.active)return;
+   if(f.raw===EXAM[exam.i].formula){exam.correct++;showToast("✅ Respuesta correcta","good")}else showToast(`❌ Era ${EXAM[exam.i].formula}`,"bad");
+   exam.i++;clearSlots();
+   if(exam.i>=EXAM.length)finishExam();else showToast(`🎯 ${EXAM[exam.i].text}`);
+  },700);
+ };
+ showToast(`🎯 ${EXAM[0].text}`);
+}
+async function finishExam(){
+ exam.active=false;window.synthesize=window.__oldSynth;
+ const score=exam.correct;showToast(`🏁 Evaluación: ${score}/5`);
+ try{await addDoc(collection(db,"records_enlace"),{name:exam.name.substring(0,30),score,date:new Date(),version:"v4"})}catch(e){}
+ alert(`Evaluación finalizada\\n\\nEstudiante: ${exam.name}\\nCorrectas: ${score}/5\\nNota: ${score===0?1:score}`);
+}
+
+/* =========================
+   RENDER
+========================= */
+function renderHeader(){
+ document.getElementById("studentName").textContent=state.name;
+ document.getElementById("levelText").textContent=`Nivel ${state.level} · ${LEVELS[state.level-1].name}`;
+ document.getElementById("streak").textContent=state.streak;
+ document.getElementById("statCorrect").textContent=state.correct;
+ document.getElementById("statCompounds").textContent=state.discoveries.size;
+ document.getElementById("statCoins").textContent=state.coins;
+ document.getElementById("statMastery").textContent=totalMastery()+"%";
+ const currentBase=LEVELS[state.level-1].need,nextBase=state.level<LEVELS.length?LEVELS[state.level].need:currentBase+100;
+ const pct=Math.min(100,((state.xp-currentBase)/Math.max(1,nextBase-currentBase))*100);
+ document.getElementById("xpFill").style.width=pct+"%";
+ document.getElementById("xpText").textContent=`${state.xp} XP · próximo hito: ${nextBase} XP`;
+}
+function renderAll(){renderHeader();renderAcademy();renderAtoms();renderSlots();renderQuests();renderLabChallenge();if(document.getElementById("perfil").classList.contains("active"))renderProfile()}
+load();
+syncProgression();
+window.onload=()=>{renderAll();drawCanvas();renderArena()};
+</script>
+
+<script id="mobile-runtime">
+(function(){
+  // Prevent accidental double taps on action buttons.
+  let lastTap=0;
+  document.addEventListener("click",function(e){
+    const b=e.target.closest("button");
+    if(!b || b.disabled)return;
+    const now=Date.now();
+    if(now-lastTap<120 && b.dataset.noDoubleTap!=="false"){
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      return;
+    }
+    lastTap=now;
+  },true);
+
+  // Keep the viewport stable when the mobile keyboard opens.
+  window.addEventListener("resize",function(){
+    document.documentElement.style.setProperty("--vh",(window.innerHeight*0.01)+"px");
+  },{passive:true});
+  document.documentElement.style.setProperty("--vh",(window.innerHeight*0.01)+"px");
+
+  // Avoid browser pull-to-refresh while the user is playing.
+  document.addEventListener("touchmove",function(e){
+    if(e.target.closest(".choices,.choice,.tabs,.nav-tabs,.bottom-nav")) return;
+  },{passive:true});
+})();
+</script>
 </body>
 </html>
