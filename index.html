@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>EnlaceQuest: Laboratorio de Enlaces</title>
+    <title>EnlaceQuest: Laboratorio de Enlaces (Extendido)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -12,19 +12,15 @@
             --correct: #73daca; --error: #f7768e; --warning: #ff9e64;
             --btn-bg: #414868; --accent: #7aa2f7;
         }
-
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-
         body {
             font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             background-color: var(--bg-color); color: var(--text-color);
             margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center;
         }
-
         header { text-align: center; width: 100%; max-width: 1200px; margin-bottom: 15px; }
         h1 { margin: 0 0 5px 0; color: var(--accent); font-size: 1.8rem; }
         #subtitle { margin: 0 0 15px 0; font-size: 1rem; opacity: 0.8; }
-        
         .controls { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; width: 100%; }
         .controls button {
             background-color: var(--accent); color: #1a1b26; border: none; padding: 10px 15px;
@@ -32,26 +28,20 @@
             flex: 1 1 auto; min-width: 100px; max-width: 180px; transition: transform 0.1s;
         }
         .controls button:active { transform: scale(0.95); }
-
         .glass-panel {
             background: rgba(36, 40, 59, 0.7); backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.1);
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
             border-radius: 12px; padding: 15px; margin-bottom: 15px;
         }
-
         #login-panel, #mission-panel, #records-panel { display: none; width: 100%; max-width: 800px; text-align: center; }
-        
-        /* Estilos Login */
         #login-panel { max-width: 400px; margin: 0 auto 15px auto; border-color: var(--accent); }
         .login-input { width: 100%; padding: 12px; border-radius: 8px; border: none; margin-bottom: 15px; background: #14151f; color: #fff; font-size: 1rem; text-align: center; }
         .login-input:focus { outline: 2px solid var(--accent); }
-
         #mission-panel { border-color: var(--correct); }
         .mission-title { color: var(--correct); font-size: 1.1rem; margin: 0 0 5px 0; text-transform: uppercase; }
         .mission-text { font-size: 1.2rem; font-weight: bold; margin: 0 0 15px 0; line-height: 1.3; color: #fff;}
         .mission-stats { display: flex; justify-content: space-around; background: var(--panel-bg); padding: 10px; border-radius: 8px; font-weight: bold;}
-
         #records-panel { border-color: var(--warning); position: relative; max-width: 500px; }
         .records-scroll { max-height: 280px; overflow-y: auto; margin-bottom: 15px; padding-right: 5px; }
         .records-scroll::-webkit-scrollbar { width: 6px; }
@@ -59,52 +49,48 @@
         .record-list { list-style: none; padding: 0; text-align: left; margin: 0; }
         .record-list li { background: var(--panel-bg); margin-bottom: 8px; padding: 12px 15px; border-radius: 8px; display: flex; justify-content: space-between; font-weight: bold; border-left: 4px solid var(--warning); }
         .close-x { position: absolute; top: 10px; right: 15px; font-size: 1.2rem; color: var(--error); cursor: pointer; width: 30px; height: 30px; display: flex; justify-content: center; align-items: center; border-radius: 50%; background: rgba(247, 118, 142, 0.1);}
-
-        #lab-section { display: flex; width: 100%; max-width: 1000px; gap: 15px; justify-content: center; flex-wrap: wrap; }
-        .panel { flex: 1; min-width: 300px; }
-
+        #lab-section { display: flex; width: 100%; max-width: 1100px; gap: 15px; justify-content: center; flex-wrap: wrap; }
+        .panel { flex: 1; min-width: 320px; }
         .atom-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 15px; }
         .atom-btn {
             background: var(--btn-bg); color: white; border: 2px solid transparent; border-radius: 8px;
             padding: 8px 4px; cursor: pointer; display: flex; flex-direction: column; align-items: center;
-            transition: 0.2s;
+            transition: 0.2s; position: relative;
         }
-        .atom-btn strong { font-size: 1.3rem; color: var(--accent); }
+        .atom-btn strong { font-size: 1.2rem; color: var(--accent); }
         .atom-btn small { font-size: 0.7rem; opacity: 0.8; }
+        .atom-btn .ox-state { font-size: 0.6rem; color: var(--correct); margin-top: 3px; font-weight: bold; background: rgba(0,0,0,0.3); padding: 2px 5px; border-radius: 4px;}
         .atom-btn:hover { background: #565f89; border-color: var(--accent); }
         .atom-btn.metal strong { color: #f7768e; }
         .atom-btn.nonmetal strong { color: #9ece6a; }
-
-        .slots-container { display: flex; justify-content: center; align-items: center; gap: 10px; margin-bottom: 15px; flex-wrap: wrap;}
-        .slot { width: 60px; height: 60px; border: 2px dashed #565f89; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 1.5rem; font-weight: bold; background: #14151f; color: #565f89; cursor: pointer;}
+        .slots-container { display: flex; justify-content: center; align-items: center; gap: 8px; margin-bottom: 15px; flex-wrap: wrap;}
+        .slot { width: 55px; height: 55px; border: 2px dashed #565f89; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 1.3rem; font-weight: bold; background: #14151f; color: #565f89; cursor: pointer;}
         .slot.filled { border: 2px solid var(--accent); color: white; background: #24283b; }
-        
         .equation-box { font-size: 1.8rem; font-weight: bold; color: var(--accent); text-align: center; margin-bottom: 15px; background: var(--panel-bg); padding: 10px; border-radius: 8px; border: 1px dashed var(--correct); display: none; }
-
-        canvas { background: #14151f; border-radius: 10px; border: 2px solid #3b4261; width: 100%; max-width: 450px; height: 250px; box-shadow: inset 0 0 20px rgba(0,0,0,0.8); margin: 0 auto; display: block; }
-
+        canvas { background: #14151f; border-radius: 10px; border: 2px solid #3b4261; width: 100%; max-width: 500px; height: 260px; box-shadow: inset 0 0 20px rgba(0,0,0,0.8); margin: 0 auto; display: block; }
         .action-btn { width: 100%; padding: 15px; font-size: 1.2rem; font-weight: bold; border-radius: 10px; border: none; cursor: pointer; margin-top: 15px; transition: 0.2s; }
         .btn-react { background: var(--correct); color: #1a1b26; }
         .btn-react:disabled { background: #565f89; color: #a9b1d6; cursor: not-allowed; }
         .btn-clear { background: transparent; border: 1px solid var(--error); color: var(--error); margin-top: 10px;}
-
         .result-box { margin-top: 15px; text-align: center; display: none; animation: fadeIn 0.5s; }
-        .delta-en { font-size: 2rem; font-weight: bold; margin: 5px 0 15px 0; }
-        .bond-tag { display: inline-block; padding: 8px 15px; border-radius: 8px; font-weight: bold; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 1px;}
+        .delta-en { font-size: 2rem; font-weight: bold; margin: 5px 0 10px 0; }
+        .bond-tag { display: inline-block; padding: 8px 15px; border-radius: 8px; font-weight: bold; font-size: 1rem; text-transform: uppercase; letter-spacing: 1px;}
         .tag-ionic { background: rgba(247, 118, 142, 0.2); color: var(--ionic); border: 1px solid var(--ionic); }
         .tag-polar { background: rgba(224, 175, 104, 0.2); color: var(--polar); border: 1px solid var(--polar); }
         .tag-apolar { background: rgba(125, 207, 255, 0.2); color: var(--apolar); border: 1px solid var(--apolar); }
-
+        .compound-info { margin-top: 15px; background: #14151f; padding: 15px; border-radius: 10px; border-left: 5px solid var(--accent); text-align: left; }
+        .compound-info h4 { margin: 0 0 10px 0; color: white; font-size: 1.2rem; display: flex; justify-content: space-between;}
+        .info-row { margin-bottom: 8px; font-size: 0.95rem; }
+        .info-label { color: var(--accent); font-weight: bold; width: 120px; display: inline-block; }
+        .info-value { color: #c0caf5; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-
-        @media (max-width: 768px) { #lab-section { flex-direction: column; } .atom-grid { grid-template-columns: repeat(4, 1fr); } }
+        @media (max-width: 768px) { #lab-section { flex-direction: column; } .atom-grid { grid-template-columns: repeat(3, 1fr); } }
     </style>
 </head>
 <body>
-
     <header>
         <h1>EnlaceQuest SJ</h1>
-        <p id="subtitle">Síntesis Molecular y Electronegatividad</p>
+        <p id="subtitle">Síntesis Molecular, Nomenclatura y Propiedades (v2.0)</p>
         <div class="controls">
             <button onclick="setMode('libre')" style="background-color: #e0af68;">⚛️ Modo Libre</button>
             <button onclick="showLogin()" style="background-color: var(--correct); color: #1a1b26;">🎯 Evaluación</button>
@@ -138,31 +124,37 @@
     <div id="lab-section">
         <div class="panel glass-panel">
             <h3 style="margin-top:0; text-align:center; color:var(--accent);">Tabla de Reactivos</h3>
-            <p style="font-size:0.85rem; text-align:center; color:#a9b1d6;">Selecciona 2 o 3 elementos para combinarlos.</p>
-            
-            <div class="atom-grid" id="atom-grid">
-                </div>
-
+            <p style="font-size:0.85rem; text-align:center; color:#a9b1d6;">Selecciona elementos (¡4 tubos disponibles!)</p>
+            <div class="atom-grid" id="atom-grid"></div>
             <div class="slots-container">
                 <div id="slot1" class="slot" onclick="clearSlot(1)">1</div>
                 <div style="font-size: 1.5rem; color:#565f89;">+</div>
                 <div id="slot2" class="slot" onclick="clearSlot(2)">2</div>
                 <div style="font-size: 1.5rem; color:#565f89;">+</div>
                 <div id="slot3" class="slot" onclick="clearSlot(3)">3</div>
+                <div style="font-size: 1.5rem; color:#565f89;">+</div>
+                <div id="slot4" class="slot" onclick="clearSlot(4)">4</div>
             </div>
-
             <button id="btn-react" class="action-btn btn-react" onclick="startReaction()" disabled>Sintetizar Compuesto</button>
             <button class="action-btn btn-clear" onclick="clearAll()">Vaciar Tubos de Ensayo</button>
         </div>
-
         <div class="panel glass-panel">
             <div id="equation-display" class="equation-box">Na + Cl &rarr; NaCl</div>
-            <canvas id="bondCanvas" width="450" height="250"></canvas>
-            
+            <canvas id="bondCanvas" width="500" height="260"></canvas>
             <div id="result-box" class="result-box">
-                <div style="color:#a9b1d6; font-size:0.9rem; margin-top:10px;">Diferencia Máxima de Electronegatividad (ΔEN)</div>
-                <div id="delta-en" class="delta-en">0.9</div>
-                <div id="bond-type" class="bond-tag tag-polar">Covalente Polar</div>
+                <div style="display: flex; justify-content: space-around; align-items: center;">
+                    <div>
+                        <div style="color:#a9b1d6; font-size:0.8rem; margin-top:5px;">Max. Diferencia (ΔEN)</div>
+                        <div id="delta-en" class="delta-en">0.9</div>
+                    </div>
+                    <div id="bond-type" class="bond-tag tag-polar">Covalente Polar</div>
+                </div>
+                <div class="compound-info" id="compound-info">
+                    <h4>Ficha Técnica <i class="fas fa-flask"></i></h4>
+                    <div class="info-row"><span class="info-label">Nomenclatura:</span> <span class="info-value" id="comp-name" style="font-weight:bold; color:white;"></span></div>
+                    <div class="info-row"><span class="info-label">Familia/Grupo:</span> <span class="info-value" id="comp-group" style="color:var(--warning)"></span></div>
+                    <div class="info-row"><span class="info-label">Propiedades:</span> <span class="info-value" id="comp-props"></span></div>
+                </div>
             </div>
         </div>
     </div>
@@ -182,33 +174,109 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // --- DATOS QUÍMICOS COMPLETOS ---
+        // --- ELEMENTOS AMPLIADOS ---
         const elements = {
-            "H":  { name: "Hidrógeno", en: 2.1, type: "nonmetal", color: "#ffffff" },
-            "Na": { name: "Sodio",     en: 0.9, type: "metal",    color: "#f7768e" },
-            "Mg": { name: "Magnesio",  en: 1.2, type: "metal",    color: "#ff9e64" },
-            "K":  { name: "Potasio",   en: 0.8, type: "metal",    color: "#ff7a7a" },
-            "Ca": { name: "Calcio",    en: 1.0, type: "metal",    color: "#ffb86c" },
-            "C":  { name: "Carbono",   en: 2.5, type: "nonmetal", color: "#9ece6a" },
-            "N":  { name: "Nitrógeno", en: 3.0, type: "nonmetal", color: "#7aa2f7" },
-            "P":  { name: "Fósforo",   en: 2.1, type: "nonmetal", color: "#f1fa8c" },
-            "O":  { name: "Oxígeno",   en: 3.5, type: "nonmetal", color: "#bb9af7" },
-            "S":  { name: "Azufre",    en: 2.5, type: "nonmetal", color: "#50fa7b" },
-            "F":  { name: "Flúor",     en: 4.0, type: "nonmetal", color: "#7dcfff" },
-            "Cl": { name: "Cloro",     en: 3.1, type: "nonmetal", color: "#1abc9c" }
+            "H":  { name: "Hidrógeno", en: 2.1, type: "nonmetal", color: "#ffffff", ox: "+1, -1" },
+            "Na": { name: "Sodio",     en: 0.9, type: "metal",    color: "#f7768e", ox: "+1" },
+            "K":  { name: "Potasio",   en: 0.8, type: "metal",    color: "#ff7a7a", ox: "+1" },
+            "Mg": { name: "Magnesio",  en: 1.2, type: "metal",    color: "#ff9e64", ox: "+2" },
+            "Ca": { name: "Calcio",    en: 1.0, type: "metal",    color: "#ffb86c", ox: "+2" },
+            "Al": { name: "Aluminio",  en: 1.5, type: "metal",    color: "#bfc9ca", ox: "+3" },
+            "Fe": { name: "Hierro",    en: 1.8, type: "metal",    color: "#e67e22", ox: "+2, +3" },
+            "Cu": { name: "Cobre",     en: 1.9, type: "metal",    color: "#f39c12", ox: "+1, +2" },
+            "Zn": { name: "Zinc",      en: 1.6, type: "metal",    color: "#aab7b8", ox: "+2" },
+            "Ag": { name: "Plata",     en: 1.9, type: "metal",    color: "#c0c0c0", ox: "+1" },
+            "C":  { name: "Carbono",   en: 2.5, type: "nonmetal", color: "#9ece6a", ox: "±4, +2" },
+            "N":  { name: "Nitrógeno", en: 3.0, type: "nonmetal", color: "#7aa2f7", ox: "±3, +5" },
+            "P":  { name: "Fósforo",   en: 2.1, type: "nonmetal", color: "#f1fa8c", ox: "±3, +5" },
+            "O":  { name: "Oxígeno",   en: 3.5, type: "nonmetal", color: "#bb9af7", ox: "-2" },
+            "S":  { name: "Azufre",    en: 2.5, type: "nonmetal", color: "#50fa7b", ox: "-2, +4, +6" },
+            "F":  { name: "Flúor",     en: 4.0, type: "nonmetal", color: "#7dcfff", ox: "-1" },
+            "Cl": { name: "Cloro",     en: 3.1, type: "nonmetal", color: "#1abc9c", ox: "-1, +1, +3, +5, +7" },
+            "Br": { name: "Bromo",     en: 2.8, type: "nonmetal", color: "#e74c3c", ox: "-1, +1, +3, +5" },
+            "I":  { name: "Yodo",      en: 2.5, type: "nonmetal", color: "#9b59b6", ox: "-1, +1, +5, +7" }
         };
 
-        // --- ESTADO DEL JUEGO ---
-        let slots = [null, null, null];
+        // --- DICCIONARIO DE COMPUESTOS EXTENDIDO (hasta 4 átomos) ---
+        const knownCompounds = {
+            // Binarios H + halógenos
+            "HCl": { name: "Cloruro de Hidrógeno (Ác. Clorhídrico)", group: "Haluro de Hidrógeno", properties: "Gas incoloro, muy soluble en agua formando ácido clorhídrico." },
+            "HF": { name: "Fluoruro de Hidrógeno (Ác. Fluorhídrico)", group: "Haluro de Hidrógeno", properties: "Líquido fumante altamente corrosivo, ataca el vidrio." },
+            "HBr": { name: "Bromuro de Hidrógeno (Ác. Bromhídrico)", group: "Haluro de Hidrógeno", properties: "Gas incoloro que se disuelve fácilmente en agua." },
+            "HI": { name: "Yoduro de Hidrógeno (Ác. Yodhídrico)", group: "Haluro de Hidrógeno", properties: "Gas incoloro, en agua forma un ácido fuerte." },
+            // Óxidos e hidruros sencillos
+            "H2O": { name: "Agua (Óxido de Dihidrógeno)", group: "Óxido / Hidruro", properties: "Líquido vital, solvente universal gracias a sus puentes de hidrógeno." },
+            "H2S": { name: "Ácido Sulfhídrico", group: "Hidruro no metálico / Ácido", properties: "Gas extremadamente tóxico, olor a huevos podridos." },
+            "H2O2": { name: "Peróxido de Hidrógeno (Agua oxigenada)", group: "Peróxido", properties: "Líquido oxidante, usado como desinfectante y blanqueador." },
+            "NH3": { name: "Amoníaco", group: "Hidruro no metálico", properties: "Gas incoloro de olor penetrante, usado en fertilizantes." },
+            "PH3": { name: "Fosfina", group: "Hidruro no metálico", properties: "Gas inflamable y tóxico, con olor a ajo o pescado podrido." },
+            // Óxidos metálicos
+            "Na2O": { name: "Óxido de Sodio", group: "Óxido Básico", properties: "Sólido blanco que reacciona violentamente con agua formando NaOH." },
+            "MgO": { name: "Óxido de Magnesio", group: "Óxido Básico", properties: "Sólido blanco, antiácido y refractario." },
+            "CaO": { name: "Óxido de Calcio (Cal Viva)", group: "Óxido Básico", properties: "Sólido cáustico, reacciona con agua liberando calor." },
+            "Al2O3": { name: "Óxido de Aluminio (Alúmina)", group: "Óxido Anfótero", properties: "Material muy duro, base de rubíes y zafiros." },
+            "Fe2O3": { name: "Óxido de Hierro(III) (Hematita)", group: "Óxido Metálico", properties: "Sólido rojizo, principal mena de hierro (herrumbre)." },
+            "FeO": { name: "Óxido de Hierro(II) (Wustita)", group: "Óxido Metálico", properties: "Polvo negro, inestable a temperatura ambiente." },
+            "CuO": { name: "Óxido de Cobre(II) (Tenorita)", group: "Óxido Metálico", properties: "Sólido negro, semiconductor tipo p." },
+            "Cu2O": { name: "Óxido de Cobre(I) (Cuprita)", group: "Óxido Metálico", properties: "Sólido rojo, usado en pinturas antiincrustantes." },
+            "ZnO": { name: "Óxido de Zinc", group: "Óxido Anfótero", properties: "Polvo blanco, protector solar físico y semiconductor." },
+            "Ag2O": { name: "Óxido de Plata", group: "Óxido Metálico", properties: "Sólido marrón oscuro, usado en baterías de plata-zinc." },
+            // Sales haloideas (haluros metálicos)
+            "NaCl": { name: "Cloruro de Sodio", group: "Sal Haloidea", properties: "Sal de mesa, cristalina, soluble en agua." },
+            "NaF": { name: "Fluoruro de Sodio", group: "Sal Haloidea", properties: "Sólido blanco, usado en pastas dentales." },
+            "NaBr": { name: "Bromuro de Sodio", group: "Sal Haloidea", properties: "Sólido cristalino, usado en medicina como sedante." },
+            "NaI": { name: "Yoduro de Sodio", group: "Sal Haloidea", properties: "Sólido blanco, fuente de yodo en suplementos." },
+            "KCl": { name: "Cloruro de Potasio", group: "Sal Haloidea", properties: "Sólido blanco, fertilizante y sustituto de la sal." },
+            "MgCl2": { name: "Cloruro de Magnesio", group: "Sal Haloidea", properties: "Sólido higroscópico, usado para control de hielo." },
+            "MgF2": { name: "Fluoruro de Magnesio", group: "Sal Haloidea", properties: "Cristal transparente, usado en lentes ópticas." },
+            "CaCl2": { name: "Cloruro de Calcio", group: "Sal Haloidea", properties: "Sal altamente higroscópica, derrite hielo." },
+            "CaF2": { name: "Fluoruro de Calcio (Fluorita)", group: "Sal Haloidea", properties: "Mineral fluorescente, fuente de flúor." },
+            "AlCl3": { name: "Cloruro de Aluminio", group: "Sal Haloidea", properties: "Sólido blanco, catalizador en reacciones de Friedel-Crafts." },
+            "FeCl2": { name: "Cloruro de Hierro(II)", group: "Sal Haloidea", properties: "Sólido verde pálido, soluble en agua." },
+            "FeCl3": { name: "Cloruro de Hierro(III)", group: "Sal Haloidea", properties: "Sólido marrón oscuro, corrosivo, usado en tratamiento de aguas." },
+            "CuCl": { name: "Cloruro de Cobre(I)", group: "Sal Haloidea", properties: "Sólido blanco, insoluble en agua." },
+            "CuCl2": { name: "Cloruro de Cobre(II)", group: "Sal Haloidea", properties: "Sólido azul verdoso, fungicida." },
+            "ZnCl2": { name: "Cloruro de Zinc", group: "Sal Haloidea", properties: "Sólido blanco, fundente en soldaduras." },
+            "AgCl": { name: "Cloruro de Plata", group: "Sal Haloidea", properties: "Sólido blanco, fotosensible (se oscurece con luz)." },
+            "AgBr": { name: "Bromuro de Plata", group: "Sal Haloidea", properties: "Sólido amarillento, usado en fotografía analógica." },
+            "AgI": { name: "Yoduro de Plata", group: "Sal Haloidea", properties: "Sólido amarillo, usado en siembra de nubes." },
+            // Óxidos no metálicos
+            "CO2": { name: "Dióxido de Carbono", group: "Óxido Ácido", properties: "Gas incoloro, producto de la respiración y combustión." },
+            "CO": { name: "Monóxido de Carbono", group: "Óxido Ácido", properties: "Gas tóxico, inodoro, producto de combustión incompleta." },
+            "NO": { name: "Óxido Nítrico", group: "Óxido No Metálico", properties: "Gas incoloro, neurotransmisor y contaminante." },
+            "NO2": { name: "Dióxido de Nitrógeno", group: "Óxido Ácido", properties: "Gas marrón rojizo, tóxico, precursor de lluvia ácida." },
+            "N2O": { name: "Óxido Nitroso (Gas de la risa)", group: "Óxido No Metálico", properties: "Gas incoloro, anestésico suave y propelente." },
+            "SO2": { name: "Dióxido de Azufre", group: "Óxido Ácido", properties: "Gas tóxico, olor a cerilla quemada, genera lluvia ácida." },
+            "SO3": { name: "Trióxido de Azufre", group: "Óxido Ácido", properties: "Sólido fumante, precursor del ácido sulfúrico." },
+            "P2O5": { name: "Pentóxido de Difósforo", group: "Óxido Ácido", properties: "Sólido blanco, desecante extremadamente potente." },
+            "Cl2O": { name: "Monóxido de Dicloro", group: "Óxido Ácido", properties: "Gas marrón amarillento, agente blanqueador." },
+            // Diatómicos elementales
+            "H2": { name: "Hidrógeno Molecular", group: "Elemento Diatómico", properties: "Gas inflamable, el más ligero del universo." },
+            "O2": { name: "Oxígeno Molecular", group: "Elemento Diatómico", properties: "Gas oxidante, esencial para la respiración." },
+            "N2": { name: "Nitrógeno Molecular", group: "Elemento Diatómico", properties: "Gas inerte, compone el 78% del aire." },
+            "F2": { name: "Flúor Molecular", group: "Elemento Diatómico", properties: "Gas amarillo pálido, el más reactivo y electronegativo." },
+            "Cl2": { name: "Cloro Molecular", group: "Elemento Diatómico", properties: "Gas verde amarillento, tóxico, desinfectante." },
+            "Br2": { name: "Bromo Molecular", group: "Elemento Diatómico", properties: "Líquido rojo oscuro, vapores tóxicos." },
+            "I2": { name: "Yodo Molecular", group: "Elemento Diatómico", properties: "Sólido gris violáceo que sublima, antiséptico." },
+            "O3": { name: "Ozono", group: "Alótropo del Oxígeno", properties: "Gas azulado, protege de la radiación UV en la estratosfera." },
+            // Algunos compuestos ternarios adicionales (con 4 átomos)
+            "NaOH": { name: "Hidróxido de Sodio (Sosa Cáustica)", group: "Hidróxido", properties: "Sólido blanco, base fuerte, corrosivo." },
+            "KOH": { name: "Hidróxido de Potasio", group: "Hidróxido", properties: "Sólido blanco, base fuerte, usado en jabones." },
+            "Mg(OH)2": { name: "Hidróxido de Magnesio", group: "Hidróxido", properties: "Sólido blanco, antiácido (leche de magnesia)." },
+            "Ca(OH)2": { name: "Hidróxido de Calcio (Cal apagada)", group: "Hidróxido", properties: "Sólido blanco, usado en construcción y agricultura." }
+        };
+
+        // --- ESTADO ---
+        let slots = [null, null, null, null]; // 4 slots
         let activeAtoms = [];
-        let animState = 'idle'; 
+        let animState = 'idle';
         let animProgress = 0;
         let currentBond = null;
-        let currentStudentName = ""; 
+        let currentStudentName = "";
 
-        // Banco de 20 misiones
         let gameActive = false, currentMission = 0, timeLeft = 90, timer, correctAnswers = 0;
         let activeMissions = [];
+
         const allMissions = [
             { text: "Sintetiza Agua (H2O).", check: (res) => res.rawFormula === 'H2O' },
             { text: "Crea Dióxido de Carbono (CO2).", check: (res) => res.rawFormula === 'CO2' },
@@ -219,27 +287,30 @@
             { text: "Construye una molécula IÓNICA usando 3 átomos.", check: (res) => res.type === 'ionic' && res.atoms.length === 3 },
             { text: "Construye un compuesto COVALENTE POLAR con 3 átomos.", check: (res) => res.type === 'polar' && res.atoms.length === 3 },
             { text: "Sintetiza Ácido Sulfhídrico (H2S).", check: (res) => res.rawFormula === 'H2S' },
-            { text: "Forma una molécula biatómica de Nitrógeno (N2).", check: (res) => res.rawFormula === 'N2' },
+            { text: "Sintetiza Amoníaco (NH3).", check: (res) => res.rawFormula === 'NH3' },
+            { text: "Crea Cloruro de Hidrógeno (HCl).", check: (res) => res.rawFormula === 'HCl' },
             { text: "Sintetiza Óxido de Magnesio (MgO).", check: (res) => res.rawFormula === 'MgO' },
             { text: "Crea Fluoruro de Sodio (NaF).", check: (res) => res.rawFormula === 'NaF' },
             { text: "Sintetiza Cloruro de Potasio (KCl).", check: (res) => res.rawFormula === 'KCl' },
             { text: "Construye una molécula de Flúor (F2).", check: (res) => res.rawFormula === 'F2' },
             { text: "Sintetiza Monóxido de Carbono (CO).", check: (res) => res.rawFormula === 'CO' },
-            { text: "Forma un compuesto de Magnesio y Flúor (MgF2).", check: (res) => res.rawFormula === 'MgF2' },
-            { text: "Sintetiza Óxido de Calcio (CaO).", check: (res) => res.rawFormula === 'CaO' },
+            { text: "Forma Óxido de Aluminio (Al2O3).", check: (res) => res.rawFormula === 'Al2O3' },
+            { text: "Sintetiza Cloruro de Plata (AgCl).", check: (res) => res.rawFormula === 'AgCl' },
             { text: "Crea Dióxido de Azufre (SO2).", check: (res) => res.rawFormula === 'SO2' },
             { text: "Sintetiza Ozono (O3).", check: (res) => res.rawFormula === 'O3' },
-            { text: "Crea una molécula biatómica de Cloro (Cl2).", check: (res) => res.rawFormula === 'Cl2' }
+            { text: "Crea una molécula biatómica de Cloro (Cl2).", check: (res) => res.rawFormula === 'Cl2' },
+            { text: "Sintetiza Peróxido de Hidrógeno (H2O2).", check: (res) => res.rawFormula === 'H2O2' },
+            { text: "Crea Bromuro de Plata (AgBr).", check: (res) => res.rawFormula === 'AgBr' }
         ];
 
-        // --- INICIALIZACIÓN UI ---
+        // --- UI ---
         function initGrid() {
             const grid = document.getElementById('atom-grid');
             grid.innerHTML = '';
             for (const [sym, data] of Object.entries(elements)) {
                 const btn = document.createElement('div');
                 btn.className = `atom-btn ${data.type}`;
-                btn.innerHTML = `<strong>${sym}</strong><small>EN: ${data.en}</small>`;
+                btn.innerHTML = `<strong>${sym}</strong><small>EN: ${data.en}</small><div class="ox-state">Ox: ${data.ox}</div>`;
                 btn.onclick = () => selectAtom(sym);
                 grid.appendChild(btn);
             }
@@ -247,11 +318,11 @@
 
         window.selectAtom = (sym) => {
             if (animState !== 'idle') return;
-            for (let i = 0; i < 3; i++) {
+            for (let i = 0; i < slots.length; i++) {
                 if (!slots[i]) {
                     slots[i] = sym;
-                    const el = document.getElementById(`slot${i+1}`);
-                    el.innerText = sym; el.classList.add('filled');
+                    document.getElementById(`slot${i+1}`).innerText = sym;
+                    document.getElementById(`slot${i+1}`).classList.add('filled');
                     break;
                 }
             }
@@ -268,7 +339,7 @@
             updateActiveAtoms();
         };
 
-        window.clearAll = () => { [1,2,3].forEach(n => window.clearSlot(n)); };
+        window.clearAll = () => { for(let i=1;i<=slots.length;i++) window.clearSlot(i); };
 
         function updateActiveAtoms() {
             activeAtoms = slots.filter(Boolean);
@@ -278,14 +349,10 @@
 
         function buildEquation() {
             const reactants = activeAtoms.join(" + ");
-            
             const counts = {};
             activeAtoms.forEach(a => counts[a] = (counts[a] || 0) + 1);
-            
             const sortedUnique = Object.keys(counts).sort((a,b) => elements[a].en - elements[b].en);
-            
-            let productRaw = "";
-            let productHTML = "";
+            let productRaw = "", productHTML = "";
             sortedUnique.forEach(sym => {
                 productRaw += sym;
                 productHTML += sym;
@@ -294,32 +361,25 @@
                     productHTML += `<sub>${counts[sym]}</sub>`;
                 }
             });
-
             currentBond.rawFormula = productRaw;
-            
             const eqBox = document.getElementById('equation-display');
             eqBox.innerHTML = `${reactants} <span style="color:#fff">&rarr;</span> ${productHTML}`;
             eqBox.style.display = 'block';
         }
 
-        // --- LÓGICA DE REACCIÓN ---
         window.startReaction = () => {
             if (activeAtoms.length < 2) return;
             document.getElementById('btn-react').disabled = true;
             document.getElementById('result-box').style.display = 'none';
-            
             let maxDelta = 0;
             for (let i = 0; i < activeAtoms.length - 1; i++) {
                 let d = Math.abs(elements[activeAtoms[i]].en - elements[activeAtoms[i+1]].en);
                 if (d > maxDelta) maxDelta = d;
             }
-            
             let type = 'apolar';
             if (maxDelta > 1.7) type = 'ionic';
             else if (maxDelta > 0.4) type = 'polar';
-
             currentBond = { atoms: activeAtoms, delta: parseFloat(maxDelta.toFixed(1)), type: type };
-            
             animState = 'reacting';
             animProgress = 0;
             requestAnimationFrame(animateReaction);
@@ -327,199 +387,153 @@
 
         function showResults() {
             buildEquation();
-            const res = document.getElementById('result-box');
             document.getElementById('delta-en').innerText = currentBond.delta.toFixed(1);
-            
             const tag = document.getElementById('bond-type');
             tag.className = `bond-tag tag-${currentBond.type}`;
-            
-            if(currentBond.type === 'ionic') { tag.innerText = "Carácter Iónico"; tag.style.color = "var(--ionic)"; }
-            else if(currentBond.type === 'polar') { tag.innerText = "Covalente Polar"; tag.style.color = "var(--polar)"; }
-            else { tag.innerText = "Covalente Apolar"; tag.style.color = "var(--apolar)"; }
-            
-            res.style.display = 'block';
+            if(currentBond.type === 'ionic') tag.innerText = "Carácter Iónico";
+            else if(currentBond.type === 'polar') tag.innerText = "Covalente Polar";
+            else tag.innerText = "Covalente Apolar";
+
+            const compInfo = knownCompounds[currentBond.rawFormula];
+            if (compInfo) {
+                document.getElementById('comp-name').innerText = compInfo.name;
+                document.getElementById('comp-group').innerText = compInfo.group;
+                document.getElementById('comp-props').innerText = compInfo.properties;
+            } else {
+                document.getElementById('comp-name').innerText = currentBond.rawFormula + " (Desconocido/Inestable)";
+                document.getElementById('comp-group').innerText = "Sin clasificar";
+                document.getElementById('comp-props').innerText = "Las valencias no encajan o esta mezcla teórica no existe establemente bajo condiciones normales.";
+            }
+            document.getElementById('result-box').style.display = 'block';
 
             if (gameActive) {
                 setTimeout(() => {
                     if (activeMissions[currentMission].check(currentBond)) {
-                        alert("¡Correcto!");
+                        alert("¡Correcto! Molécula sintetizada con éxito.");
                         correctAnswers++;
                     } else {
-                        alert(`¡Incorrecto! El compuesto sintetizado no cumple con el objetivo de la misión.\nEl correcto dependía de la misión solicitada.`);
+                        alert("¡Incorrecto! La síntesis no cumple con el objetivo de la misión.");
                     }
                     currentMission++;
                     animState = 'idle';
                     window.clearAll();
                     loadMission();
-                }, 1000);
+                }, 2000);
             } else {
                 setTimeout(() => { animState = 'idle'; document.getElementById('btn-react').disabled = false; }, 500);
             }
         }
 
-        // --- RENDERIZADO DEL CANVAS ---
+        // --- CANVAS (soporte para 2,3,4 átomos) ---
         const canvas = document.getElementById('bondCanvas');
         const ctx = canvas.getContext('2d');
+        const positionsMap = {
+            2: { start: [120, 380], end: [190, 310] },
+            3: { start: [80, 250, 420], end: [140, 250, 360] },
+            4: { start: [60, 180, 320, 440], end: [100, 200, 300, 400] }
+        };
 
         function drawAtomBase(x, y, sym, data) {
-            ctx.beginPath(); ctx.arc(x, y, 40, 0, Math.PI * 2);
+            ctx.beginPath(); ctx.arc(x, y, 35, 0, Math.PI * 2);
             ctx.fillStyle = "#24283b"; ctx.fill();
             ctx.lineWidth = 3; ctx.strokeStyle = data.color; ctx.stroke();
-
-            ctx.fillStyle = "#fff"; ctx.font = "bold 24px Arial";
+            ctx.fillStyle = "#fff"; ctx.font = "bold 20px Arial";
             ctx.textAlign = "center"; ctx.textBaseline = "middle";
             ctx.fillText(sym, x, y);
         }
 
         function drawElectrons(x1, x2, y, sym1, sym2, progress) {
-            const data1 = elements[sym1], data2 = elements[sym2];
-            
-            if(animState === 'idle') {
-                ctx.beginPath(); ctx.arc(x1 + 45, y, 5, 0, Math.PI*2); ctx.fillStyle = data1.color; ctx.fill();
-                ctx.beginPath(); ctx.arc(x2 - 45, y, 5, 0, Math.PI*2); ctx.fillStyle = data2.color; ctx.fill();
-                return;
-            }
-
-            const en1 = data1.en, en2 = data2.en;
-            const delta = Math.abs(en1 - en2);
-            const isIonic = delta > 1.7;
-            const isPolar = delta > 0.4 && delta <= 1.7;
-
+            const d1 = elements[sym1], d2 = elements[sym2];
+            const delta = Math.abs(d1.en - d2.en);
+            const isIonic = delta > 1.7, isPolar = delta > 0.4 && delta <= 1.7;
             if (isIonic) {
-                const p1Wins = en1 > en2;
-                const loserX = p1Wins ? x2 - 45 : x1 + 45;
-                const winnerX = p1Wins ? x1 + 55 : x2 - 55;
-                const loserColor = p1Wins ? data2.color : data1.color;
-
+                const p1Wins = d1.en > d2.en;
+                const loserX = p1Wins ? x2 - 35 : x1 + 35;
+                const winnerX = p1Wins ? x1 + 45 : x2 - 45;
                 const curX = loserX + (winnerX - loserX) * progress;
-
-                if(progress < 1) {
-                    ctx.beginPath(); ctx.arc(curX, y, 5, 0, Math.PI*2); ctx.fillStyle = loserColor; ctx.fill();
-                    ctx.beginPath(); ctx.arc(winnerX, y - 10, 5, 0, Math.PI*2); ctx.fillStyle = p1Wins ? data1.color : data2.color; ctx.fill();
-                } else {
-                    ctx.beginPath(); ctx.arc(winnerX, y + 10, 5, 0, Math.PI*2); ctx.fillStyle = loserColor; ctx.fill();
-                    ctx.beginPath(); ctx.arc(winnerX, y - 10, 5, 0, Math.PI*2); ctx.fillStyle = p1Wins ? data1.color : data2.color; ctx.fill();
-
-                    ctx.fillStyle = "rgba(247, 118, 142, 0.9)"; ctx.font = "bold 20px Arial";
-                    ctx.fillText("+", p1Wins ? x2 : x1, y - 50);
+                ctx.beginPath(); ctx.arc(curX, y, 5, 0, Math.PI*2);
+                ctx.fillStyle = p1Wins ? d2.color : d1.color; ctx.fill();
+                if (progress > 0.9) {
+                    ctx.fillStyle = "rgba(247, 118, 142, 0.9)"; ctx.font = "bold 18px Arial";
+                    ctx.fillText("+", p1Wins ? x2 : x1, y - 45);
                     ctx.fillStyle = "rgba(125, 207, 255, 0.9)";
-                    ctx.fillText("-", p1Wins ? x1 : x2, y - 50);
+                    ctx.fillText("-", p1Wins ? x1 : x2, y - 45);
                 }
             } else {
                 const midX = (x1 + x2) / 2;
-                let shift = 0;
-                if(isPolar) {
-                    shift = en1 > en2 ? -15 : 15;
-                    if(progress > 0.8) {
-                        ctx.fillStyle = "rgba(255,255,255,0.6)"; ctx.font = "italic 16px Arial";
-                        ctx.fillText(en1 > en2 ? "δ-" : "δ+", x1, y - 50);
-                        ctx.fillText(en2 > en1 ? "δ-" : "δ+", x2, y - 50);
-                    }
-                }
+                let shift = isPolar ? (d1.en > d2.en ? -12 : 12) : 0;
                 const targetX = midX + shift;
-                const cur1X = (x1 + 45) + (targetX - 5 - (x1 + 45)) * progress;
-                const cur2X = (x2 - 45) + (targetX + 5 - (x2 - 45)) * progress;
-
-                ctx.beginPath(); ctx.arc(cur1X, y + 5, 5, 0, Math.PI*2); ctx.fillStyle = data1.color; ctx.fill();
-                ctx.beginPath(); ctx.arc(cur2X, y - 5, 5, 0, Math.PI*2); ctx.fillStyle = data2.color; ctx.fill();
+                const cur1X = (x1 + 35) + (targetX - 5 - (x1 + 35)) * progress;
+                const cur2X = (x2 - 35) + (targetX + 5 - (x2 - 35)) * progress;
+                ctx.beginPath(); ctx.arc(cur1X, y + 4, 5, 0, Math.PI*2); ctx.fillStyle = d1.color; ctx.fill();
+                ctx.beginPath(); ctx.arc(cur2X, y - 4, 5, 0, Math.PI*2); ctx.fillStyle = d2.color; ctx.fill();
+                if (isPolar && progress > 0.8) {
+                    ctx.fillStyle = "rgba(255,255,255,0.6)"; ctx.font = "italic 14px Arial";
+                    ctx.fillText(d1.en > d2.en ? "δ-" : "δ+", x1, y - 45);
+                    ctx.fillText(d2.en > d1.en ? "δ-" : "δ+", x2, y - 45);
+                }
             }
         }
 
         function drawCanvas() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             const num = activeAtoms.length;
-            if(num === 0) return;
-
-            const startPositions = num === 2 ? [100, 350] : [75, 225, 375];
-            const endPositions   = num === 2 ? [175, 275] : [125, 225, 325];
-
-            const currentPositions = startPositions.map((start, i) => {
-                if(currentBond && currentBond.type !== 'ionic') {
-                    return start + (endPositions[i] - start) * (animState === 'idle' ? 0 : animProgress);
+            if (num < 2) return;
+            const pos = positionsMap[num] || positionsMap[4];
+            const currentPos = pos.start.map((s, i) => {
+                if (currentBond && animState !== 'idle') {
+                    return s + (pos.end[i] - s) * animProgress;
                 }
-                return start;
+                return s;
             });
-
-            activeAtoms.forEach((sym, i) => {
-                drawAtomBase(currentPositions[i], 125, sym, elements[sym]);
-            });
-
-            for(let i=0; i < num - 1; i++) {
-                drawElectrons(currentPositions[i], currentPositions[i+1], 125, activeAtoms[i], activeAtoms[i+1], animProgress);
+            activeAtoms.forEach((sym, i) => drawAtomBase(currentPos[i], 130, sym, elements[sym]));
+            for (let i = 0; i < num - 1; i++) {
+                drawElectrons(currentPos[i], currentPos[i+1], 130, activeAtoms[i], activeAtoms[i+1], animProgress);
             }
         }
 
         function animateReaction() {
             animProgress += 0.02;
-            if (animProgress >= 1) {
-                animProgress = 1; animState = 'done';
-                drawCanvas(); showResults();
-            } else {
-                drawCanvas(); requestAnimationFrame(animateReaction);
-            }
+            if (animProgress >= 1) { animProgress = 1; animState = 'done'; drawCanvas(); showResults(); }
+            else { drawCanvas(); requestAnimationFrame(animateReaction); }
         }
 
-        // --- SISTEMA DE LOGIN, MISIONES Y FIREBASE ---
-        window.setMode = (mode) => { 
-            gameActive = false; clearInterval(timer); 
-            document.getElementById('mission-panel').style.display = 'none'; 
+        // --- SISTEMA DE JUEGO ---
+        window.setMode = (mode) => {
+            gameActive = false; clearInterval(timer);
+            document.getElementById('mission-panel').style.display = 'none';
             document.getElementById('records-panel').style.display = 'none';
             document.getElementById('login-panel').style.display = 'none';
             window.clearAll();
         };
 
-        window.showLogin = () => {
-            window.setMode('libre');
-            document.getElementById('login-panel').style.display = 'block';
-        };
+        window.showLogin = () => { window.setMode('libre'); document.getElementById('login-panel').style.display = 'block'; };
 
         window.validateZip = async () => {
             const zip = document.getElementById('zip-input').value.trim();
             const err = document.getElementById('login-error');
             const btn = document.getElementById('btn-validate');
-            
             if(!zip) { err.innerText = "Ingresa tu código ZipGrade."; return; }
-            
-            if(localStorage.getItem('examen_realizado_' + zip)) {
-                err.innerText = "Ya has presentado esta evaluación y no puedes volver a ingresar.";
-                return;
-            }
-            
-            btn.disabled = true;
-            btn.innerText = "Verificando...";
-            err.innerText = "";
-
+            if(localStorage.getItem('examen_realizado_' + zip)) { err.innerText = "Ya has presentado esta evaluación."; return; }
+            btn.disabled = true; btn.innerText = "Verificando..."; err.innerText = "";
             try {
                 const docRef = doc(db, "estudiantes", zip);
                 const docSnap = await getDoc(docRef);
-                
                 if(docSnap.exists()) {
                     const data = docSnap.data();
-                    currentStudentName = data.nombre || `${data["First Name"] || ''} ${data["Last Name"] || ''}`.trim() || "Estudiante";
-                    
+                    currentStudentName = data.nombre || `${data["First Name"]||''} ${data["Last Name"]||''}`.trim() || "Estudiante";
                     document.getElementById('login-panel').style.display = 'none';
                     document.getElementById('player-name').innerText = currentStudentName;
                     startMissions();
-                } else {
-                    err.innerText = "Código no encontrado. Verifica tu ZipGrade.";
-                }
-            } catch(e) {
-                err.innerText = "Error de conexión con Firebase.";
-                console.error(e);
-            } finally {
-                btn.disabled = false;
-                btn.innerText = "Verificar e Iniciar";
-            }
+                } else err.innerText = "Código no encontrado.";
+            } catch(e) { err.innerText = "Error de conexión."; }
+            finally { btn.disabled = false; btn.innerText = "Verificar e Iniciar"; }
         };
 
         window.toggleRecords = async () => {
             const panel = document.getElementById('records-panel');
-            if (panel.style.display === 'block') panel.style.display = 'none'; 
-            else { 
-                window.setMode('libre');
-                panel.style.display = 'block'; 
-                await updateRecordsUI(); 
-            }
+            if (panel.style.display === 'block') panel.style.display = 'none';
+            else { window.setMode('libre'); panel.style.display = 'block'; await updateRecordsUI(); }
         };
 
         async function updateRecordsUI() {
@@ -527,27 +541,23 @@
             list.innerHTML = '<li>Cargando...</li>';
             try {
                 const q = query(collection(db, "records_enlace"), orderBy("score", "desc"), limit(50));
-                const querySnapshot = await getDocs(q);
+                const snap = await getDocs(q);
                 list.innerHTML = '';
-                if (querySnapshot.empty) { list.innerHTML = '<li>No hay notas aún.</li>'; return; }
-                
-                let index = 1;
-                querySnapshot.forEach((doc) => {
-                    const r = doc.data();
+                if (snap.empty) { list.innerHTML = '<li>No hay notas aún.</li>'; return; }
+                let idx = 1;
+                snap.forEach(d => {
+                    const r = d.data();
                     const li = document.createElement('li');
-                    let medal = index === 1 ? '🥇 ' : index === 2 ? '🥈 ' : index === 3 ? '🥉 ' : `<span style="font-size:0.8rem; color:#a9b1d6;">#${index}</span> `;
-                    let style = index <= 3 ? `color: ${index===1?'#ffd700':index===2?'#c0c0c0':'#cd7f32'}; background: rgba(255,255,255,0.05);` : '';
-                    li.style.cssText = style;
+                    let medal = idx===1?'🥇 ':idx===2?'🥈 ':idx===3?'🥉 ':`#${idx} `;
                     li.innerHTML = `<span>${medal}${r.name}</span><span style="color:var(--correct)">Nota: ${r.score}</span>`;
-                    list.appendChild(li); index++;
+                    list.appendChild(li); idx++;
                 });
-            } catch (e) { list.innerHTML = '<li>Error de conexión.</li>'; }
+            } catch(e) { list.innerHTML = '<li>Error de conexión.</li>'; }
         }
 
         function startMissions() {
             const zip = document.getElementById('zip-input').value.trim();
             localStorage.setItem('examen_realizado_' + zip, 'true');
-            
             activeMissions = [...allMissions].sort(() => 0.5 - Math.random()).slice(0, 5);
             gameActive = true; currentMission = 0; correctAnswers = 0;
             document.getElementById('mission-panel').style.display = 'block';
@@ -556,40 +566,26 @@
 
         async function saveScore(name, nota) {
             if (!name) return;
-            try {
-                await addDoc(collection(db, "records_enlace"), { 
-                    name: name.substring(0, 25) || "Anónimo", 
-                    score: nota, 
-                    date: new Date() 
-                });
-                window.toggleRecords();
-            } catch (e) { console.error("Error al guardar nota:", e); }
+            try { await addDoc(collection(db, "records_enlace"), { name: name.substring(0,25), score: nota, date: new Date() }); }
+            catch(e) { console.error(e); }
         }
 
         function loadMission() {
-            if (currentMission >= activeMissions.length) { 
+            if (currentMission >= activeMissions.length) {
                 clearInterval(timer);
-                let notaFinal = correctAnswers === 0 ? 1 : correctAnswers;
-                alert(`¡Evaluación Finalizada!\nRespuestas correctas: ${correctAnswers}/5\nNota Final: ${notaFinal}`);
-                saveScore(currentStudentName, notaFinal);
-                window.setMode('libre'); 
-                return; 
+                let nota = correctAnswers === 0 ? 1 : correctAnswers;
+                alert(`¡Evaluación Finalizada!\nRespuestas correctas: ${correctAnswers}/5\nNota Final: ${nota}`);
+                saveScore(currentStudentName, nota);
+                window.setMode('libre');
+                return;
             }
             document.getElementById('mission-desc').innerText = activeMissions[currentMission].text;
-            document.getElementById('mission-tracker').innerText = `${currentMission + 1}/${activeMissions.length}`;
-            timeLeft = 90;
-            document.getElementById('time-display').innerText = timeLeft;
+            document.getElementById('mission-tracker').innerText = `${currentMission+1}/${activeMissions.length}`;
+            timeLeft = 90; document.getElementById('time-display').innerText = timeLeft;
             clearInterval(timer);
             timer = setInterval(() => {
                 timeLeft--; document.getElementById('time-display').innerText = timeLeft;
-                if (timeLeft <= 0) { 
-                    clearInterval(timer); 
-                    alert("¡Tiempo agotado para esta pregunta! Pasando a la siguiente...");
-                    currentMission++;
-                    animState = 'idle';
-                    window.clearAll();
-                    loadMission();
-                }
+                if (timeLeft <= 0) { clearInterval(timer); alert("¡Tiempo agotado!"); currentMission++; animState='idle'; window.clearAll(); loadMission(); }
             }, 1000);
         }
 
