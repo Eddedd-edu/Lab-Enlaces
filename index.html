@@ -1,683 +1,170 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>EnlaceQuest: Laboratorio de Enlaces (v3.0)</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        :root {
-            --bg-color: #1a1b26; --panel-bg: #24283b; --text-color: #c0caf5;
-            --ionic: #f7768e; --polar: #e0af68; --apolar: #7dcfff;
-            --correct: #73daca; --error: #f7768e; --warning: #ff9e64;
-            --btn-bg: #414868; --accent: #7aa2f7;
-        }
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body {
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-color); color: var(--text-color);
-            margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center;
-        }
-        header { text-align: center; width: 100%; max-width: 1200px; margin-bottom: 15px; }
-        h1 { margin: 0 0 5px 0; color: var(--accent); font-size: 1.8rem; }
-        #subtitle { margin: 0 0 15px 0; font-size: 1rem; opacity: 0.8; }
-        .controls { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; width: 100%; }
-        .controls button {
-            background-color: var(--accent); color: #1a1b26; border: none; padding: 10px 15px;
-            border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 0.95rem;
-            flex: 1 1 auto; min-width: 100px; max-width: 180px; transition: transform 0.1s;
-        }
-        .controls button:active { transform: scale(0.95); }
-        .glass-panel {
-            background: rgba(36, 40, 59, 0.7); backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
-            border-radius: 12px; padding: 15px; margin-bottom: 15px;
-        }
-        #login-panel, #mission-panel, #records-panel { display: none; width: 100%; max-width: 800px; text-align: center; }
-        #login-panel { max-width: 400px; margin: 0 auto 15px auto; border-color: var(--accent); }
-        .login-input { width: 100%; padding: 12px; border-radius: 8px; border: none; margin-bottom: 15px; background: #14151f; color: #fff; font-size: 1rem; text-align: center; }
-        .login-input:focus { outline: 2px solid var(--accent); }
-        #mission-panel { border-color: var(--correct); }
-        .mission-title { color: var(--correct); font-size: 1.1rem; margin: 0 0 5px 0; text-transform: uppercase; }
-        .mission-text { font-size: 1.2rem; font-weight: bold; margin: 0 0 15px 0; line-height: 1.3; color: #fff;}
-        .mission-stats { display: flex; justify-content: space-around; background: var(--panel-bg); padding: 10px; border-radius: 8px; font-weight: bold;}
-        #records-panel { border-color: var(--warning); position: relative; max-width: 500px; }
-        .records-scroll { max-height: 280px; overflow-y: auto; margin-bottom: 15px; padding-right: 5px; }
-        .records-scroll::-webkit-scrollbar { width: 6px; }
-        .records-scroll::-webkit-scrollbar-thumb { background: var(--warning); border-radius: 10px; }
-        .record-list { list-style: none; padding: 0; text-align: left; margin: 0; }
-        .record-list li { background: var(--panel-bg); margin-bottom: 8px; padding: 12px 15px; border-radius: 8px; display: flex; justify-content: space-between; font-weight: bold; border-left: 4px solid var(--warning); }
-        .close-x { position: absolute; top: 10px; right: 15px; font-size: 1.2rem; color: var(--error); cursor: pointer; width: 30px; height: 30px; display: flex; justify-content: center; align-items: center; border-radius: 50%; background: rgba(247, 118, 142, 0.1);}
-        #lab-section { display: flex; width: 100%; max-width: 1100px; gap: 15px; justify-content: center; flex-wrap: wrap; }
-        .panel { flex: 1; min-width: 320px; }
-        .atom-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 15px; }
-        .atom-btn {
-            background: var(--btn-bg); color: white; border: 2px solid transparent; border-radius: 8px;
-            padding: 8px 4px; cursor: pointer; display: flex; flex-direction: column; align-items: center;
-            transition: 0.2s; position: relative;
-        }
-        .atom-btn strong { font-size: 1.2rem; color: var(--accent); }
-        .atom-btn small { font-size: 0.7rem; opacity: 0.8; }
-        .atom-btn .ox-state { font-size: 0.6rem; color: var(--correct); margin-top: 3px; font-weight: bold; background: rgba(0,0,0,0.3); padding: 2px 5px; border-radius: 4px;}
-        .atom-btn:hover { background: #565f89; border-color: var(--accent); }
-        .atom-btn.metal strong { color: #f7768e; }
-        .atom-btn.nonmetal strong { color: #9ece6a; }
-        .slots-container { display: flex; justify-content: center; align-items: center; gap: 8px; margin-bottom: 15px; flex-wrap: wrap;}
-        .slot { width: 55px; height: 55px; border: 2px dashed #565f89; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 1.3rem; font-weight: bold; background: #14151f; color: #565f89; cursor: pointer;}
-        .slot.filled { border: 2px solid var(--accent); color: white; background: #24283b; }
-        .equation-box { font-size: 1.8rem; font-weight: bold; color: var(--accent); text-align: center; margin-bottom: 15px; background: var(--panel-bg); padding: 10px; border-radius: 8px; border: 1px dashed var(--correct); display: none; }
-        canvas { background: #14151f; border-radius: 10px; border: 2px solid #3b4261; width: 100%; max-width: 500px; height: 260px; box-shadow: inset 0 0 20px rgba(0,0,0,0.8); margin: 0 auto; display: block; }
-        .action-btn { width: 100%; padding: 15px; font-size: 1.2rem; font-weight: bold; border-radius: 10px; border: none; cursor: pointer; margin-top: 15px; transition: 0.2s; }
-        .btn-react { background: var(--correct); color: #1a1b26; }
-        .btn-react:disabled { background: #565f89; color: #a9b1d6; cursor: not-allowed; }
-        .btn-clear { background: transparent; border: 1px solid var(--error); color: var(--error); margin-top: 10px;}
-        .result-box { margin-top: 15px; text-align: center; display: none; animation: fadeIn 0.5s; }
-        .delta-en { font-size: 2rem; font-weight: bold; margin: 5px 0 10px 0; }
-        .bond-tag { display: inline-block; padding: 8px 15px; border-radius: 8px; font-weight: bold; font-size: 1rem; text-transform: uppercase; letter-spacing: 1px;}
-        .tag-ionic { background: rgba(247, 118, 142, 0.2); color: var(--ionic); border: 1px solid var(--ionic); }
-        .tag-polar { background: rgba(224, 175, 104, 0.2); color: var(--polar); border: 1px solid var(--polar); }
-        .tag-apolar { background: rgba(125, 207, 255, 0.2); color: var(--apolar); border: 1px solid var(--apolar); }
-        .compound-info { margin-top: 15px; background: #14151f; padding: 15px; border-radius: 10px; border-left: 5px solid var(--accent); text-align: left; }
-        .compound-info h4 { margin: 0 0 10px 0; color: white; font-size: 1.2rem; display: flex; justify-content: space-between;}
-        .info-row { margin-bottom: 8px; font-size: 0.95rem; }
-        .info-label { color: var(--accent); font-weight: bold; width: 120px; display: inline-block; }
-        .info-value { color: #c0caf5; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-        @media (max-width: 768px) { #lab-section { flex-direction: column; } .atom-grid { grid-template-columns: repeat(3, 1fr); } }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>EnlaceQuest SJ v4.0 — Academia de Enlaces</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<meta name="theme-color" content="#07111f">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="format-detection" content="telephone=no">
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <header>
-        <h1>EnlaceQuest SJ</h1>
-        <p id="subtitle">Síntesis Molecular, Nomenclatura y Propiedades (v3.0)</p>
-        <div class="controls">
-            <button onclick="setMode('libre')" style="background-color: #e0af68;">⚛️ Modo Libre</button>
-            <button onclick="showLogin()" style="background-color: var(--correct); color: #1a1b26;">🎯 Evaluación</button>
-            <button onclick="toggleRecords()" style="background-color: var(--warning); color: #1a1b26;">🏆 Top Global</button>
-        </div>
-    </header>
+<header>
+  <h1>🧪 EnlaceQuest SJ</h1>
+  <p class="subtitle">Academia de Enlaces · aprende jugando, domina y desbloquea</p>
+  <div class="topbar">
+    <button class="btn primary" onclick="showView('academia')">🎮 Academia</button>
+    <button class="btn yellow" onclick="showView('laboratorio')">⚛️ Laboratorio</button>
+    <button class="btn purple" onclick="showView('desafios')">⚔️ Desafíos</button>
+    <button class="btn green" onclick="showView('perfil')">🏆 Mi progreso</button>
+    <button class="btn dark" onclick="openLogin()">🎯 Evaluación docente</button>
+  </div>
+</header>
 
-    <div id="login-panel" class="glass-panel">
-        <h3 style="color:var(--accent); margin-top:0;">Autenticación de Estudiante</h3>
-        <p style="font-size:0.9rem; margin-bottom:15px; color:#a9b1d6;">Ingresa tu código ZipGrade para iniciar la evaluación.</p>
-        <input type="number" id="zip-input" class="login-input" placeholder="Tu Código ZipGrade">
-        <button class="action-btn btn-react" onclick="validateZip()" id="btn-validate">Verificar e Iniciar</button>
-        <div id="login-error" style="color:var(--error); margin-top:10px; font-weight:bold;"></div>
+<main class="wrap">
+  <section class="hero">
+    <div class="panel">
+      <div class="profile">
+        <div class="avatar" id="avatar">⚗️</div>
+        <div>
+          <div class="name" id="studentName">Aprendiz de Química</div>
+          <div class="level" id="levelText">Nivel 1 · Aprendiz</div>
+          <div class="xpbar"><div class="xpfill" id="xpFill"></div></div>
+          <small class="note" id="xpText">0 / 100 XP</small>
+        </div>
+        <div class="streak">🔥 <span id="streak">0</span></div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="stats">
+        <div class="stat"><b id="statCorrect">0</b><small>aciertos</small></div>
+        <div class="stat"><b id="statCompounds">0</b><small>descubiertos</small></div>
+        <div class="stat"><b id="statCoins">0</b><small>química</small></div>
+        <div class="stat"><b id="statMastery">0%</b><small>dominio</small></div>
+      </div>
+    </div>
+  </section>
+
+  <nav class="panel tabs">
+    <button class="tab active" data-view="academia" onclick="showView('academia')">🗺️ Academia</button>
+    <button class="tab" data-view="laboratorio" onclick="showView('laboratorio')">🧪 Laboratorio</button>
+    <button class="tab" data-view="desafios" onclick="showView('desafios')">⚔️ Desafíos</button>
+    <button class="tab" data-view="perfil" onclick="showView('perfil')">📚 Progreso</button>
+  </nav>
+
+  <section id="academia" class="view active">
+    <div class="panel">
+      <div class="section-title">
+        <h2>🗺️ Ruta de dominio</h2>
+        <span class="badge polar" id="chapterBadge">Capítulo 1</span>
+      </div>
+      <p class="note">No basta con acertar una vez: cada capítulo exige práctica, precisión y una misión de dominio antes de desbloquear el siguiente.</p>
+      <div class="progress-map" id="progressMap"></div>
+    </div>
+    <div class="panel">
+      <div class="section-title">
+        <h2>🎯 Misión de hoy</h2>
+        <span class="timer" id="academyTimer">∞</span>
+      </div>
+      <div id="dailyChallenge" class="challenge"></div>
     </div>
 
-    <div id="mission-panel" class="glass-panel">
-        <h3 class="mission-title">Evaluación - Jugador: <span id="player-name" style="color:white;"></span></h3>
-        <p class="mission-text" id="mission-desc">-</p>
-        <div class="mission-stats">
-            <div>Pregunta: <span id="mission-tracker" style="color:var(--accent)">0/5</span></div>
-            <div>⏱️ <span id="time-display" style="color:var(--warning)">90</span>s</div>
-        </div>
+    <div class="panel">
+      <div class="section-title">
+        <h2>📋 Misiones de progreso</h2>
+        <span class="badge polar" id="missionCount">0/5</span>
+      </div>
+      <div id="academyQuests" class="quest-list"></div>
     </div>
 
-    <div id="records-panel" class="glass-panel">
-        <div class="close-x" onclick="toggleRecords()"><i class="fas fa-times"></i></div>
-        <h3 class="mission-title" style="color:var(--warning); margin-bottom: 15px;">Salón de la Fama</h3>
-        <div class="records-scroll"><ul class="record-list" id="record-list"></ul></div>
+    <div class="panel">
+      <div class="section-title">
+        <h2>🔓 Elementos desbloqueados</h2>
+        <span class="badge ionic" id="academyElementCount">0</span>
+      </div>
+      <p class="note">Los elementos se desbloquean al superar capítulos. Los bloqueados muestran el próximo objetivo.</p>
+      <div id="academyElements" class="pillrow"></div>
+      <div id="unlockGuide" class="info" style="margin-top:12px"></div>
     </div>
+  </section>
 
-    <div id="lab-section">
-        <div class="panel glass-panel">
-            <h3 style="margin-top:0; text-align:center; color:var(--accent);">Tabla de Reactivos</h3>
-            <p style="font-size:0.85rem; text-align:center; color:#a9b1d6;">Selecciona elementos (¡4 tubos disponibles!)</p>
-            <div class="atom-grid" id="atom-grid"></div>
-            <div class="slots-container">
-                <div id="slot1" class="slot" onclick="clearSlot(1)">1</div>
-                <div style="font-size: 1.5rem; color:#565f89;">+</div>
-                <div id="slot2" class="slot" onclick="clearSlot(2)">2</div>
-                <div style="font-size: 1.5rem; color:#565f89;">+</div>
-                <div id="slot3" class="slot" onclick="clearSlot(3)">3</div>
-                <div style="font-size: 1.5rem; color:#565f89;">+</div>
-                <div id="slot4" class="slot" onclick="clearSlot(4)">4</div>
-            </div>
-            <button id="btn-react" class="action-btn btn-react" onclick="startReaction()" disabled>Sintetizar Compuesto</button>
-            <button class="action-btn btn-clear" onclick="clearAll()">Vaciar Tubos de Ensayo</button>
+  <section id="laboratorio" class="view">
+    <div class="labgrid">
+      <div class="panel">
+        <div class="section-title">
+          <h2>⚗️ Banco de elementos</h2>
+          <span class="badge ionic" id="unlockBadge">Desbloqueados: 8</span>
         </div>
-        <div class="panel glass-panel">
-            <div id="equation-display" class="equation-box"></div>
-            <canvas id="bondCanvas" width="500" height="260"></canvas>
-            <div id="result-box" class="result-box">
-                <div style="display: flex; justify-content: space-around; align-items: center;">
-                    <div>
-                        <div style="color:#a9b1d6; font-size:0.8rem; margin-top:5px;">Max. Diferencia (ΔEN)</div>
-                        <div id="delta-en" class="delta-en">0.9</div>
-                    </div>
-                    <div id="bond-type" class="bond-tag tag-polar">Covalente Polar</div>
-                </div>
-                <div class="compound-info" id="compound-info">
-                    <h4>Ficha Técnica <i class="fas fa-flask"></i></h4>
-                    <div class="info-row"><span class="info-label">Nomenclatura:</span> <span class="info-value" id="comp-name" style="font-weight:bold; color:white;"></span></div>
-                    <div class="info-row"><span class="info-label">Familia/Grupo:</span> <span class="info-value" id="comp-group" style="color:var(--warning)"></span></div>
-                    <div class="info-row"><span class="info-label">Propiedades:</span> <span class="info-value" id="comp-props"></span></div>
-                </div>
-            </div>
+        <p class="note">Elige átomos para construir sustancias. <b>Los elementos con 🔒 todavía no están disponibles.</b> Supera misiones y capítulos para desbloquearlos.</p>
+        <div class="atom-grid" id="atomGrid"></div>
+        <div class="slots">
+          <div class="slot" id="slot1" onclick="removeSlot(0)">1</div><span>+</span>
+          <div class="slot" id="slot2" onclick="removeSlot(1)">2</div><span>+</span>
+          <div class="slot" id="slot3" onclick="removeSlot(2)">3</div><span>+</span>
+          <div class="slot" id="slot4" onclick="removeSlot(3)">4</div>
         </div>
+        <button class="btn green" style="width:100%;padding:14px" id="synthBtn" onclick="synthesize()" disabled>🧬 Sintetizar</button>
+        <button class="btn red" style="width:100%;margin-top:8px" onclick="clearSlots()">Vaciar tubos</button>
+      </div>
+      <div class="panel">
+        <div class="section-title">
+          <h2>🧪 Reto del laboratorio</h2>
+          <span class="badge polar" id="labQuestionLevel">Nivel 1</span>
+        </div>
+        <p class="note">6 preguntas por nivel · dificultad progresiva · respuestas aleatorias.</p>
+        <div id="labChallenge"></div>
+      </div>
+      <div class="panel">
+        <div id="equation" class="eq hidden"></div>
+        <canvas id="canvas" width="500" height="260"></canvas>
+        <div id="result" class="info hidden"></div>
+      </div>
     </div>
+  </section>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, getDocs, query, orderBy, limit, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+  <section id="desafios" class="view">
+    <div class="panel">
+      <div class="section-title">
+        <h2>⚔️ Arena de desafíos</h2>
+        <span class="badge polar">XP ×1.5</span>
+      </div>
+      <p class="note">Cada respuesta explica por qué. Si fallas, debes recuperar el concepto para aumentar el dominio.</p>
+      <div id="arena"></div>
+    </div>
+    <div class="panel">
+      <h3>📋 Misiones de dominio</h3>
+      <div id="questList" class="quest-list"></div>
+    </div>
+  </section>
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyCw4JnCCFHVogAEXncodxi9jnwigO7qUIA",
-            authDomain: "quimicaquest.firebaseapp.com",
-            projectId: "quimicaquest",
-            storageBucket: "quimicaquest.firebasestorage.app",
-            messagingSenderId: "796534851347",
-            appId: "1:796534851347:web:ae85716a8b612d889b3ce6"
-        };
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+  <section id="perfil" class="view">
+    <div class="panel">
+      <div class="section-title"><h2>🏆 Tu progreso</h2><button class="btn dark" onclick="resetLocalProgress()">Reiniciar progreso local</button></div>
+      <div id="profileDetails"></div>
+    </div>
+    <div class="panel">
+      <h3>🥇 Salón de la fama</h3>
+      <ul id="leaderboard" class="leader"><li>Cargando...</li></ul>
+    </div>
+  </section>
+</main>
 
-        // ----- ELEMENTOS (con tipo y EN) -----
-        const elements = {
-            "H":  { name: "Hidrógeno", en: 2.1, type: "nonmetal", color: "#ffffff", ox: "+1, -1" },
-            "Na": { name: "Sodio",     en: 0.9, type: "metal",    color: "#f7768e", ox: "+1" },
-            "K":  { name: "Potasio",   en: 0.8, type: "metal",    color: "#ff7a7a", ox: "+1" },
-            "Mg": { name: "Magnesio",  en: 1.2, type: "metal",    color: "#ff9e64", ox: "+2" },
-            "Ca": { name: "Calcio",    en: 1.0, type: "metal",    color: "#ffb86c", ox: "+2" },
-            "Al": { name: "Aluminio",  en: 1.5, type: "metal",    color: "#bfc9ca", ox: "+3" },
-            "Fe": { name: "Hierro",    en: 1.8, type: "metal",    color: "#e67e22", ox: "+2, +3" },
-            "Cu": { name: "Cobre",     en: 1.9, type: "metal",    color: "#f39c12", ox: "+1, +2" },
-            "Zn": { name: "Zinc",      en: 1.6, type: "metal",    color: "#aab7b8", ox: "+2" },
-            "Ag": { name: "Plata",     en: 1.9, type: "metal",    color: "#c0c0c0", ox: "+1" },
-            "C":  { name: "Carbono",   en: 2.5, type: "nonmetal", color: "#9ece6a", ox: "±4, +2" },
-            "Si": { name: "Silicio",   en: 1.8, type: "nonmetal", color: "#7f8c8d", ox: "±4" },
-            "N":  { name: "Nitrógeno", en: 3.0, type: "nonmetal", color: "#7aa2f7", ox: "±3, +5" },
-            "P":  { name: "Fósforo",   en: 2.1, type: "nonmetal", color: "#f1fa8c", ox: "±3, +5" },
-            "O":  { name: "Oxígeno",   en: 3.5, type: "nonmetal", color: "#bb9af7", ox: "-2" },
-            "S":  { name: "Azufre",    en: 2.5, type: "nonmetal", color: "#50fa7b", ox: "-2, +4, +6" },
-            "F":  { name: "Flúor",     en: 4.0, type: "nonmetal", color: "#7dcfff", ox: "-1" },
-            "Cl": { name: "Cloro",     en: 3.1, type: "nonmetal", color: "#1abc9c", ox: "-1, +1, +3, +5, +7" },
-            "Br": { name: "Bromo",     en: 2.8, type: "nonmetal", color: "#e74c3c", ox: "-1, +1, +3, +5" },
-            "I":  { name: "Yodo",      en: 2.5, type: "nonmetal", color: "#9b59b6", ox: "-1, +1, +5, +7" }
-        };
+<div id="toast" class="toast"></div>
 
-        // ----- DICCIONARIO DE COMPUESTOS (100+ fórmulas) -----
-        const knownCompounds = {
-            // Hidrácidos y haluros de hidrógeno
-            "HCl": { name: "Ácido Clorhídrico (Cloruro de Hidrógeno)", group: "Hidrácido", properties: "Gas incoloro, soluble en agua. Ácido fuerte corrosivo." },
-            "HF": { name: "Ácido Fluorhídrico (Fluoruro de Hidrógeno)", group: "Hidrácido", properties: "Líquido fumante altamente corrosivo, ataca el vidrio." },
-            "HBr": { name: "Ácido Bromhídrico (Bromuro de Hidrógeno)", group: "Hidrácido", properties: "Gas incoloro, ácido fuerte." },
-            "HI": { name: "Ácido Yodhídrico (Yoduro de Hidrógeno)", group: "Hidrácido", properties: "Gas incoloro, ácido fuerte." },
-            "H2S": { name: "Ácido Sulfhídrico (Sulfuro de Hidrógeno)", group: "Hidrácido", properties: "Gas tóxico, olor a huevos podridos." },
-            // Hidruros covalentes (grupos 14-15)
-            "CH4": { name: "Metano", group: "Hidruro covalente (alcano)", properties: "Gas inflamable, principal componente del gas natural." },
-            "SiH4": { name: "Silano", group: "Hidruro covalente", properties: "Gas pirofórico, se inflama espontáneamente en aire." },
-            "NH3": { name: "Amoníaco", group: "Hidruro covalente", properties: "Gas incoloro, olor penetrante, fertilizante." },
-            "PH3": { name: "Fosfina", group: "Hidruro covalente", properties: "Gas tóxico, olor a ajo." },
-            // Óxidos metálicos (básicos y anfóteros)
-            "Na2O": { name: "Óxido de Sodio", group: "Óxido Básico", properties: "Sólido blanco, reacciona con agua formando NaOH." },
-            "MgO": { name: "Óxido de Magnesio", group: "Óxido Básico", properties: "Sólido blanco, antiácido." },
-            "CaO": { name: "Óxido de Calcio (Cal Viva)", group: "Óxido Básico", properties: "Sólido cáustico, reacciona exotérmicamente con agua." },
-            "Al2O3": { name: "Óxido de Aluminio (Alúmina)", group: "Óxido Anfótero", properties: "Material muy duro, base de rubíes y zafiros." },
-            "Fe2O3": { name: "Óxido de Hierro(III) (Hematita)", group: "Óxido Metálico", properties: "Sólido rojizo, herrumbre." },
-            "FeO": { name: "Óxido de Hierro(II) (Wustita)", group: "Óxido Metálico", properties: "Polvo negro." },
-            "CuO": { name: "Óxido de Cobre(II) (Tenorita)", group: "Óxido Metálico", properties: "Sólido negro, semiconductor." },
-            "Cu2O": { name: "Óxido de Cobre(I) (Cuprita)", group: "Óxido Metálico", properties: "Sólido rojo, pigmento." },
-            "ZnO": { name: "Óxido de Zinc", group: "Óxido Anfótero", properties: "Polvo blanco, protector solar." },
-            "Ag2O": { name: "Óxido de Plata", group: "Óxido Metálico", properties: "Sólido marrón oscuro, baterías." },
-            // Óxidos no metálicos (ácidos)
-            "CO2": { name: "Dióxido de Carbono", group: "Óxido Ácido", properties: "Gas incoloro, efecto invernadero." },
-            "CO": { name: "Monóxido de Carbono", group: "Óxido Ácido", properties: "Gas tóxico, inodoro." },
-            "NO": { name: "Óxido Nítrico", group: "Óxido No Metálico", properties: "Gas incoloro, neurotransmisor." },
-            "NO2": { name: "Dióxido de Nitrógeno", group: "Óxido Ácido", properties: "Gas marrón, precursor de lluvia ácida." },
-            "N2O": { name: "Óxido Nitroso (Gas de la risa)", group: "Óxido No Metálico", properties: "Anestésico." },
-            "SO2": { name: "Dióxido de Azufre", group: "Óxido Ácido", properties: "Gas irritante, lluvia ácida." },
-            "SO3": { name: "Trióxido de Azufre", group: "Óxido Ácido", properties: "Sólido fumante, precursor H2SO4." },
-            "P2O5": { name: "Pentóxido de Difósforo", group: "Óxido Ácido", properties: "Desecante extremadamente potente." },
-            "Cl2O": { name: "Monóxido de Dicloro", group: "Óxido Ácido", properties: "Agente blanqueador." },
-            "SiO2": { name: "Dióxido de Silicio (Sílice)", group: "Óxido Ácido", properties: "Principal componente de la arena y el vidrio." },
-            // Peróxidos
-            "H2O2": { name: "Peróxido de Hidrógeno (Agua oxigenada)", group: "Peróxido", properties: "Líquido oxidante, desinfectante." },
-            // Sales haloideas (binarias)
-            "NaCl": { name: "Cloruro de Sodio", group: "Sal Haloidea", properties: "Sal de mesa, cristalina." },
-            "NaF": { name: "Fluoruro de Sodio", group: "Sal Haloidea", properties: "Pasta dental." },
-            "NaBr": { name: "Bromuro de Sodio", group: "Sal Haloidea", properties: "Sedante suave." },
-            "NaI": { name: "Yoduro de Sodio", group: "Sal Haloidea", properties: "Suplemento de yodo." },
-            "KCl": { name: "Cloruro de Potasio", group: "Sal Haloidea", properties: "Fertilizante, sustituto de sal." },
-            "MgCl2": { name: "Cloruro de Magnesio", group: "Sal Haloidea", properties: "Control de hielo." },
-            "MgF2": { name: "Fluoruro de Magnesio", group: "Sal Haloidea", properties: "Lentes ópticas." },
-            "CaCl2": { name: "Cloruro de Calcio", group: "Sal Haloidea", properties: "Higroscópico, derrite hielo." },
-            "CaF2": { name: "Fluoruro de Calcio (Fluorita)", group: "Sal Haloidea", properties: "Mineral fluorescente." },
-            "AlCl3": { name: "Cloruro de Aluminio", group: "Sal Haloidea", properties: "Catalizador Friedel-Crafts." },
-            "FeCl2": { name: "Cloruro de Hierro(II)", group: "Sal Haloidea", properties: "Sólido verde pálido." },
-            "FeCl3": { name: "Cloruro de Hierro(III)", group: "Sal Haloidea", properties: "Corrosivo, tratamiento de aguas." },
-            "CuCl": { name: "Cloruro de Cobre(I)", group: "Sal Haloidea", properties: "Sólido blanco, insoluble." },
-            "CuCl2": { name: "Cloruro de Cobre(II)", group: "Sal Haloidea", properties: "Sólido azul verdoso, fungicida." },
-            "ZnCl2": { name: "Cloruro de Zinc", group: "Sal Haloidea", properties: "Fundente en soldadura." },
-            "AgCl": { name: "Cloruro de Plata", group: "Sal Haloidea", properties: "Fotosensible, se oscurece." },
-            "AgBr": { name: "Bromuro de Plata", group: "Sal Haloidea", properties: "Fotografía analógica." },
-            "AgI": { name: "Yoduro de Plata", group: "Sal Haloidea", properties: "Siembra de nubes." },
-            // Hidróxidos (ternarios)
-            "NaOH": { name: "Hidróxido de Sodio (Sosa Cáustica)", group: "Hidróxido", properties: "Base fuerte, corrosiva." },
-            "KOH": { name: "Hidróxido de Potasio", group: "Hidróxido", properties: "Base fuerte, jabones." },
-            "Mg(OH)2": { name: "Hidróxido de Magnesio", group: "Hidróxido", properties: "Antiácido (leche de magnesia)." },
-            "Ca(OH)2": { name: "Hidróxido de Calcio (Cal apagada)", group: "Hidróxido", properties: "Construcción, agricultura." },
-            "Al(OH)3": { name: "Hidróxido de Aluminio", group: "Hidróxido", properties: "Antiácido, floculante." },
-            "Fe(OH)2": { name: "Hidróxido de Hierro(II)", group: "Hidróxido", properties: "Sólido verde, oxidable." },
-            "Fe(OH)3": { name: "Hidróxido de Hierro(III)", group: "Hidróxido", properties: "Sólido marrón, herrumbre." },
-            "Cu(OH)2": { name: "Hidróxido de Cobre(II)", group: "Hidróxido", properties: "Sólido azul, fungicida." },
-            "Zn(OH)2": { name: "Hidróxido de Zinc", group: "Hidróxido", properties: "Anfótero, se disuelve en ácidos y bases." },
-            // Oxisales (ternarios y cuaternarios)
-            "Na2CO3": { name: "Carbonato de Sodio", group: "Oxisal", properties: "Sólido blanco, usado en vidrio y detergentes." },
-            "NaHCO3": { name: "Bicarbonato de Sodio", group: "Oxisal ácida", properties: "Polvo blanco, antiácido y leudante." },
-            "CaCO3": { name: "Carbonato de Calcio", group: "Oxisal", properties: "Piedra caliza, mármol, antiácido." },
-            "MgCO3": { name: "Carbonato de Magnesio", group: "Oxisal", properties: "Polvo blanco, antiácido." },
-            "K2CO3": { name: "Carbonato de Potasio", group: "Oxisal", properties: "Sólido blanco, fabricación de jabón." },
-            "NaNO3": { name: "Nitrato de Sodio (Salitre de Chile)", group: "Oxisal", properties: "Fertilizante, conservante." },
-            "KNO3": { name: "Nitrato de Potasio (Salitre)", group: "Oxisal", properties: "Pólvora, fertilizante." },
-            "CaSO4": { name: "Sulfato de Calcio (Yeso)", group: "Oxisal", properties: "Material de construcción." },
-            "MgSO4": { name: "Sulfato de Magnesio (Sal de Epsom)", group: "Oxisal", properties: "Sales de baño, laxante." },
-            "Na2SO4": { name: "Sulfato de Sodio", group: "Oxisal", properties: "Detergentes, papel." },
-            "Na3PO4": { name: "Fosfato de Sodio", group: "Oxisal", properties: "Agente de limpieza, fertilizante." },
-            "Ca3(PO4)2": { name: "Fosfato de Calcio", group: "Oxisal", properties: "Componente de huesos y dientes." },
-            "Al2(SO4)3": { name: "Sulfato de Aluminio", group: "Oxisal", properties: "Floculante en tratamiento de aguas." },
-            // Diatómicos elementales y ozono
-            "H2": { name: "Hidrógeno Molecular", group: "Elemento Diatómico", properties: "Gas inflamable, el más ligero." },
-            "O2": { name: "Oxígeno Molecular", group: "Elemento Diatómico", properties: "Gas oxidante, respiración." },
-            "N2": { name: "Nitrógeno Molecular", group: "Elemento Diatómico", properties: "Gas inerte, 78% del aire." },
-            "F2": { name: "Flúor Molecular", group: "Elemento Diatómico", properties: "Gas más reactivo." },
-            "Cl2": { name: "Cloro Molecular", group: "Elemento Diatómico", properties: "Gas tóxico, desinfectante." },
-            "Br2": { name: "Bromo Molecular", group: "Elemento Diatómico", properties: "Líquido rojo oscuro, vapores tóxicos." },
-            "I2": { name: "Yodo Molecular", group: "Elemento Diatómico", properties: "Sólido gris violáceo, antiséptico." },
-            "O3": { name: "Ozono", group: "Alótropo", properties: "Gas azulado, capa de ozono." },
-            // Hidruros metálicos (metal + H)
-            "NaH": { name: "Hidruro de Sodio", group: "Hidruro Metálico", properties: "Sólido gris, reacciona violentamente con agua." },
-            "CaH2": { name: "Hidruro de Calcio", group: "Hidruro Metálico", properties: "Sólido blanco, fuente de hidrógeno." },
-        };
+<div id="loginModal" class="modal hidden">
+  <div class="modal-card panel">
+    <div class="section-title"><h2>🎯 Evaluación docente</h2><button class="btn red" onclick="closeLogin()">✕</button></div>
+    <p class="note">La evaluación usa los mismos conceptos entrenados en la Academia. El modo juego no reemplaza la evaluación formal.</p>
+    <input id="zipInput" class="code" inputmode="numeric" placeholder="Código ZipGrade">
+    <button class="btn green" style="width:100%" onclick="validateZip()">Verificar y comenzar</button>
+    <div id="loginError" style="color:var(--red);margin-top:8px"></div>
+  </div>
+</div>
 
-        // ----- FUNCIONES AUXILIARES PARA ORDENAR LA FÓRMULA -----
-        function getAtomType(sym) {
-            if (!elements[sym]) return 'unknown';
-            return elements[sym].type; // 'metal' o 'nonmetal'
-        }
-        function getEN(sym) {
-            return elements[sym] ? elements[sym].en : 0;
-        }
-
-        // Ordena los átomos según la función química detectada
-        function orderAtomsForFormula(activeAtoms) {
-            const counts = {};
-            activeAtoms.forEach(a => counts[a] = (counts[a] || 0) + 1);
-            const symbols = Object.keys(counts);
-            const metals = symbols.filter(s => elements[s].type === 'metal');
-            const nonmetals = symbols.filter(s => elements[s].type === 'nonmetal');
-
-            // Caso 1: solo no metales (compuestos covalentes)
-            if (metals.length === 0) {
-                // Si hay hidrógeno entre los no metales
-                if (counts['H']) {
-                    const otherNonmetals = nonmetals.filter(s => s !== 'H');
-                    // Grupos 16 y 17 (O, S, Se, Te, F, Cl, Br, I, At): H primero
-                    const group16_17 = ['O', 'S', 'Se', 'Te', 'F', 'Cl', 'Br', 'I', 'At'];
-                    const hasGroup16_17 = otherNonmetals.some(s => group16_17.includes(s));
-                    if (hasGroup16_17) {
-                        // Orden: H + otros ordenados por EN creciente
-                        const othersSorted = otherNonmetals.sort((a,b) => getEN(a) - getEN(b));
-                        return ['H', ...othersSorted];
-                    } else {
-                        // Grupos 14 y 15 (C, Si, N, P, As, Sb): no metal primero, H después
-                        const othersSorted = otherNonmetals.sort((a,b) => getEN(a) - getEN(b));
-                        return [...othersSorted, 'H'];
-                    }
-                } else {
-                    // Sin H, ordenar por EN creciente
-                    return symbols.sort((a,b) => getEN(a) - getEN(b));
-                }
-            }
-            // Caso 2: metales presentes (iónicos o sales)
-            else {
-                // Metales primero (ordenados por EN creciente)
-                const sortedMetals = metals.sort((a,b) => getEN(a) - getEN(b));
-                const nonmetalsWithoutH = nonmetals.filter(s => s !== 'H');
-                // Si hay oxígeno e hidrógeno juntos -> probable hidróxido: metal, O, H
-                if (nonmetals.includes('O') && nonmetals.includes('H') && nonmetals.length === 2) {
-                    // Orden típico NaOH: Na, O, H
-                    return [...sortedMetals, 'O', 'H'];
-                }
-                // Si hay oxígeno y otro no metal (oxisal): metal, no metal central (el de menor EN después del metal), O
-                if (nonmetals.includes('O') && nonmetalsWithoutH.length > 1) {
-                    const central = nonmetalsWithoutH.filter(s => s !== 'O').sort((a,b) => getEN(a) - getEN(b));
-                    // Ej: Na, C, O -> Na2CO3; orden metal, central, O
-                    return [...sortedMetals, ...central, 'O'];
-                }
-                // Resto: metales, luego no metales ordenados por EN creciente
-                const sortedNonmetals = nonmetals.sort((a,b) => getEN(a) - getEN(b));
-                return [...sortedMetals, ...sortedNonmetals];
-            }
-        }
-
-        // ----- ESTADO DEL JUEGO -----
-        let slots = [null, null, null, null];
-        let activeAtoms = [];
-        let animState = 'idle', animProgress = 0;
-        let currentBond = null;
-        let currentStudentName = "";
-        let gameActive = false, currentMission = 0, timeLeft = 90, timer, correctAnswers = 0;
-        let activeMissions = [];
-
-        const allMissions = [
-            { text: "Sintetiza Agua (H2O).", check: (res) => res.rawFormula === 'H2O' },
-            { text: "Crea Dióxido de Carbono (CO2).", check: (res) => res.rawFormula === 'CO2' },
-            { text: "Crea Sal de Mesa (NaCl).", check: (res) => res.rawFormula === 'NaCl' },
-            { text: "Crea Ácido Clorhídrico (HCl).", check: (res) => res.rawFormula === 'HCl' },
-            { text: "Sintetiza Amoníaco (NH3).", check: (res) => res.rawFormula === 'NH3' },
-            { text: "Sintetiza Metano (CH4).", check: (res) => res.rawFormula === 'CH4' },
-            { text: "Forma Hidróxido de Sodio (NaOH).", check: (res) => res.rawFormula === 'NaOH' },
-            { text: "Sintetiza Ácido Sulfhídrico (H2S).", check: (res) => res.rawFormula === 'H2S' },
-            { text: "Crea Óxido de Calcio (CaO).", check: (res) => res.rawFormula === 'CaO' },
-            { text: "Sintetiza Bicarbonato de Sodio (NaHCO3).", check: (res) => res.rawFormula === 'NaHCO3' },
-            { text: "Crea Carbonato de Calcio (CaCO3).", check: (res) => res.rawFormula === 'CaCO3' },
-            { text: "Forma una molécula diatómica de Oxígeno (O2).", check: (res) => res.rawFormula === 'O2' },
-            { text: "Construye un compuesto IÓNICO con 3 átomos.", check: (res) => res.type === 'ionic' && res.atoms.length === 3 },
-            { text: "Construye un compuesto COVALENTE POLAR con 3 átomos.", check: (res) => res.type === 'polar' && res.atoms.length === 3 },
-            { text: "Sintetiza Cloruro de Plata (AgCl).", check: (res) => res.rawFormula === 'AgCl' },
-            { text: "Crea Óxido de Aluminio (Al2O3).", check: (res) => res.rawFormula === 'Al2O3' },
-            { text: "Sintetiza Sulfato de Calcio (CaSO4).", check: (res) => res.rawFormula === 'CaSO4' },
-            { text: "Crea Hidróxido de Magnesio (Mg(OH)2).", check: (res) => res.rawFormula === 'Mg(OH)2' },
-            { text: "Forma un compuesto con carácter IÓNICO de solo 2 átomos.", check: (res) => res.type === 'ionic' && res.atoms.length === 2 },
-            { text: "Sintetiza Dióxido de Azufre (SO2).", check: (res) => res.rawFormula === 'SO2' },
-            { text: "Crea una molécula de Ozono (O3).", check: (res) => res.rawFormula === 'O3' },
-            { text: "Sintetiza Ácido Fluorhídrico (HF).", check: (res) => res.rawFormula === 'HF' },
-            { text: "Forma Silano (SiH4).", check: (res) => res.rawFormula === 'SiH4' },
-            { text: "Sintetiza Nitrato de Potasio (KNO3).", check: (res) => res.rawFormula === 'KNO3' }
-        ];
-
-        // ----- UI -----
-        function initGrid() {
-            const grid = document.getElementById('atom-grid');
-            grid.innerHTML = '';
-            for (const [sym, data] of Object.entries(elements)) {
-                const btn = document.createElement('div');
-                btn.className = `atom-btn ${data.type}`;
-                btn.innerHTML = `<strong>${sym}</strong><small>EN: ${data.en}</small><div class="ox-state">Ox: ${data.ox}</div>`;
-                btn.onclick = () => selectAtom(sym);
-                grid.appendChild(btn);
-            }
-        }
-
-        window.selectAtom = (sym) => {
-            if (animState !== 'idle') return;
-            for (let i = 0; i < slots.length; i++) {
-                if (!slots[i]) {
-                    slots[i] = sym;
-                    document.getElementById(`slot${i+1}`).innerText = sym;
-                    document.getElementById(`slot${i+1}`).classList.add('filled');
-                    break;
-                }
-            }
-            updateActiveAtoms();
-        };
-
-        window.clearSlot = (num) => {
-            if (animState !== 'idle') return;
-            slots[num-1] = null;
-            const el = document.getElementById(`slot${num}`);
-            el.innerText = num; el.classList.remove('filled');
-            document.getElementById('result-box').style.display = 'none';
-            document.getElementById('equation-display').style.display = 'none';
-            updateActiveAtoms();
-        };
-
-        window.clearAll = () => { for(let i=1;i<=slots.length;i++) window.clearSlot(i); };
-
-        function updateActiveAtoms() {
-            activeAtoms = slots.filter(Boolean);
-            document.getElementById('btn-react').disabled = activeAtoms.length < 2;
-            drawCanvas();
-        }
-
-        function buildEquation() {
-            const reactants = activeAtoms.join(" + ");
-            const ordered = orderAtomsForFormula(activeAtoms);
-            const counts = {};
-            activeAtoms.forEach(a => counts[a] = (counts[a] || 0) + 1);
-            
-            let productRaw = "", productHTML = "";
-            ordered.forEach(sym => {
-                if (!counts[sym]) return; // seguridad
-                productRaw += sym;
-                productHTML += sym;
-                if (counts[sym] > 1) {
-                    productRaw += counts[sym];
-                    productHTML += `<sub>${counts[sym]}</sub>`;
-                }
-            });
-            currentBond.rawFormula = productRaw;
-            const eqBox = document.getElementById('equation-display');
-            eqBox.innerHTML = `${reactants} <span style="color:#fff">&rarr;</span> ${productHTML}`;
-            eqBox.style.display = 'block';
-        }
-
-        window.startReaction = () => {
-            if (activeAtoms.length < 2) return;
-            document.getElementById('btn-react').disabled = true;
-            document.getElementById('result-box').style.display = 'none';
-            let maxDelta = 0;
-            for (let i = 0; i < activeAtoms.length - 1; i++) {
-                let d = Math.abs(elements[activeAtoms[i]].en - elements[activeAtoms[i+1]].en);
-                if (d > maxDelta) maxDelta = d;
-            }
-            let type = 'apolar';
-            if (maxDelta > 1.7) type = 'ionic';
-            else if (maxDelta > 0.4) type = 'polar';
-            currentBond = { atoms: activeAtoms, delta: parseFloat(maxDelta.toFixed(1)), type: type };
-            animState = 'reacting';
-            animProgress = 0;
-            requestAnimationFrame(animateReaction);
-        };
-
-        function showResults() {
-            buildEquation();
-            document.getElementById('delta-en').innerText = currentBond.delta.toFixed(1);
-            const tag = document.getElementById('bond-type');
-            tag.className = `bond-tag tag-${currentBond.type}`;
-            if(currentBond.type === 'ionic') tag.innerText = "Carácter Iónico";
-            else if(currentBond.type === 'polar') tag.innerText = "Covalente Polar";
-            else tag.innerText = "Covalente Apolar";
-
-            const compInfo = knownCompounds[currentBond.rawFormula];
-            if (compInfo) {
-                document.getElementById('comp-name').innerText = compInfo.name;
-                document.getElementById('comp-group').innerText = compInfo.group;
-                document.getElementById('comp-props').innerText = compInfo.properties;
-            } else {
-                document.getElementById('comp-name').innerText = currentBond.rawFormula + " (Desconocido/Inestable)";
-                document.getElementById('comp-group').innerText = "Sin clasificar";
-                document.getElementById('comp-props').innerText = "Combinación no registrada en la base de datos.";
-            }
-            document.getElementById('result-box').style.display = 'block';
-
-            if (gameActive) {
-                setTimeout(() => {
-                    if (activeMissions[currentMission].check(currentBond)) {
-                        alert("¡Correcto! Molécula sintetizada con éxito.");
-                        correctAnswers++;
-                    } else {
-                        alert("¡Incorrecto! La síntesis no cumple con el objetivo.");
-                    }
-                    currentMission++;
-                    animState = 'idle';
-                    window.clearAll();
-                    loadMission();
-                }, 2000);
-            } else {
-                setTimeout(() => { animState = 'idle'; document.getElementById('btn-react').disabled = false; }, 500);
-            }
-        }
-
-        // ----- CANVAS (soporte 2-4 átomos) -----
-        const canvas = document.getElementById('bondCanvas');
-        const ctx = canvas.getContext('2d');
-        const positionsMap = {
-            2: { start: [120, 380], end: [190, 310] },
-            3: { start: [80, 250, 420], end: [140, 250, 360] },
-            4: { start: [60, 180, 320, 440], end: [100, 200, 300, 400] }
-        };
-
-        function drawAtomBase(x, y, sym, data) {
-            ctx.beginPath(); ctx.arc(x, y, 35, 0, Math.PI * 2);
-            ctx.fillStyle = "#24283b"; ctx.fill();
-            ctx.lineWidth = 3; ctx.strokeStyle = data.color; ctx.stroke();
-            ctx.fillStyle = "#fff"; ctx.font = "bold 20px Arial";
-            ctx.textAlign = "center"; ctx.textBaseline = "middle";
-            ctx.fillText(sym, x, y);
-        }
-
-        function drawElectrons(x1, x2, y, sym1, sym2, progress) {
-            const d1 = elements[sym1], d2 = elements[sym2];
-            const delta = Math.abs(d1.en - d2.en);
-            const isIonic = delta > 1.7, isPolar = delta > 0.4 && delta <= 1.7;
-            if (isIonic) {
-                const p1Wins = d1.en > d2.en;
-                const loserX = p1Wins ? x2 - 35 : x1 + 35;
-                const winnerX = p1Wins ? x1 + 45 : x2 - 45;
-                const curX = loserX + (winnerX - loserX) * progress;
-                ctx.beginPath(); ctx.arc(curX, y, 5, 0, Math.PI*2);
-                ctx.fillStyle = p1Wins ? d2.color : d1.color; ctx.fill();
-                if (progress > 0.9) {
-                    ctx.fillStyle = "rgba(247, 118, 142, 0.9)"; ctx.font = "bold 18px Arial";
-                    ctx.fillText("+", p1Wins ? x2 : x1, y - 45);
-                    ctx.fillStyle = "rgba(125, 207, 255, 0.9)";
-                    ctx.fillText("-", p1Wins ? x1 : x2, y - 45);
-                }
-            } else {
-                const midX = (x1 + x2) / 2;
-                let shift = isPolar ? (d1.en > d2.en ? -12 : 12) : 0;
-                const targetX = midX + shift;
-                const cur1X = (x1 + 35) + (targetX - 5 - (x1 + 35)) * progress;
-                const cur2X = (x2 - 35) + (targetX + 5 - (x2 - 35)) * progress;
-                ctx.beginPath(); ctx.arc(cur1X, y + 4, 5, 0, Math.PI*2); ctx.fillStyle = d1.color; ctx.fill();
-                ctx.beginPath(); ctx.arc(cur2X, y - 4, 5, 0, Math.PI*2); ctx.fillStyle = d2.color; ctx.fill();
-                if (isPolar && progress > 0.8) {
-                    ctx.fillStyle = "rgba(255,255,255,0.6)"; ctx.font = "italic 14px Arial";
-                    ctx.fillText(d1.en > d2.en ? "δ-" : "δ+", x1, y - 45);
-                    ctx.fillText(d2.en > d1.en ? "δ-" : "δ+", x2, y - 45);
-                }
-            }
-        }
-
-        function drawCanvas() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            const num = activeAtoms.length;
-            if (num < 2) return;
-            const pos = positionsMap[num] || positionsMap[4];
-            const currentPos = pos.start.map((s, i) => {
-                if (currentBond && animState !== 'idle') {
-                    return s + (pos.end[i] - s) * animProgress;
-                }
-                return s;
-            });
-            activeAtoms.forEach((sym, i) => drawAtomBase(currentPos[i], 130, sym, elements[sym]));
-            for (let i = 0; i < num - 1; i++) {
-                drawElectrons(currentPos[i], currentPos[i+1], 130, activeAtoms[i], activeAtoms[i+1], animProgress);
-            }
-        }
-
-        function animateReaction() {
-            animProgress += 0.02;
-            if (animProgress >= 1) { animProgress = 1; animState = 'done'; drawCanvas(); showResults(); }
-            else { drawCanvas(); requestAnimationFrame(animateReaction); }
-        }
-
-        // ----- SISTEMA DE JUEGO -----
-        window.setMode = (mode) => {
-            gameActive = false; clearInterval(timer);
-            document.getElementById('mission-panel').style.display = 'none';
-            document.getElementById('records-panel').style.display = 'none';
-            document.getElementById('login-panel').style.display = 'none';
-            window.clearAll();
-        };
-
-        window.showLogin = () => { window.setMode('libre'); document.getElementById('login-panel').style.display = 'block'; };
-
-        window.validateZip = async () => {
-            const zip = document.getElementById('zip-input').value.trim();
-            const err = document.getElementById('login-error');
-            const btn = document.getElementById('btn-validate');
-            if(!zip) { err.innerText = "Ingresa tu código ZipGrade."; return; }
-            if(localStorage.getItem('examen_realizado_' + zip)) { err.innerText = "Ya has presentado esta evaluación."; return; }
-            btn.disabled = true; btn.innerText = "Verificando..."; err.innerText = "";
-            try {
-                const docRef = doc(db, "estudiantes", zip);
-                const docSnap = await getDoc(docRef);
-                if(docSnap.exists()) {
-                    const data = docSnap.data();
-                    currentStudentName = data.nombre || `${data["First Name"]||''} ${data["Last Name"]||''}`.trim() || "Estudiante";
-                    document.getElementById('login-panel').style.display = 'none';
-                    document.getElementById('player-name').innerText = currentStudentName;
-                    startMissions();
-                } else err.innerText = "Código no encontrado.";
-            } catch(e) { err.innerText = "Error de conexión."; }
-            finally { btn.disabled = false; btn.innerText = "Verificar e Iniciar"; }
-        };
-
-        window.toggleRecords = async () => {
-            const panel = document.getElementById('records-panel');
-            if (panel.style.display === 'block') panel.style.display = 'none';
-            else { window.setMode('libre'); panel.style.display = 'block'; await updateRecordsUI(); }
-        };
-
-        async function updateRecordsUI() {
-            const list = document.getElementById('record-list');
-            list.innerHTML = '<li>Cargando...</li>';
-            try {
-                const q = query(collection(db, "records_enlace"), orderBy("score", "desc"), limit(50));
-                const snap = await getDocs(q);
-                list.innerHTML = '';
-                if (snap.empty) { list.innerHTML = '<li>No hay notas aún.</li>'; return; }
-                let idx = 1;
-                snap.forEach(d => {
-                    const r = d.data();
-                    const li = document.createElement('li');
-                    let medal = idx===1?'🥇 ':idx===2?'🥈 ':idx===3?'🥉 ':`#${idx} `;
-                    li.innerHTML = `<span>${medal}${r.name}</span><span style="color:var(--correct)">Nota: ${r.score}</span>`;
-                    list.appendChild(li); idx++;
-                });
-            } catch(e) { list.innerHTML = '<li>Error de conexión.</li>'; }
-        }
-
-        function startMissions() {
-            const zip = document.getElementById('zip-input').value.trim();
-            localStorage.setItem('examen_realizado_' + zip, 'true');
-            activeMissions = [...allMissions].sort(() => 0.5 - Math.random()).slice(0, 5);
-            gameActive = true; currentMission = 0; correctAnswers = 0;
-            document.getElementById('mission-panel').style.display = 'block';
-            window.clearAll(); loadMission();
-        }
-
-        async function saveScore(name, nota) {
-            if (!name) return;
-            try { await addDoc(collection(db, "records_enlace"), { name: name.substring(0,25), score: nota, date: new Date() }); }
-            catch(e) { console.error(e); }
-        }
-
-        function loadMission() {
-            if (currentMission >= activeMissions.length) {
-                clearInterval(timer);
-                let nota = correctAnswers === 0 ? 1 : correctAnswers;
-                alert(`¡Evaluación Finalizada!\nRespuestas correctas: ${correctAnswers}/5\nNota Final: ${nota}`);
-                saveScore(currentStudentName, nota);
-                window.setMode('libre');
-                return;
-            }
-            document.getElementById('mission-desc').innerText = activeMissions[currentMission].text;
-            document.getElementById('mission-tracker').innerText = `${currentMission+1}/${activeMissions.length}`;
-            timeLeft = 90; document.getElementById('time-display').innerText = timeLeft;
-            clearInterval(timer);
-            timer = setInterval(() => {
-                timeLeft--; document.getElementById('time-display').innerText = timeLeft;
-                if (timeLeft <= 0) { clearInterval(timer); alert("¡Tiempo agotado!"); currentMission++; animState='idle'; window.clearAll(); loadMission(); }
-            }, 1000);
-        }
-
-        window.onload = () => { initGrid(); drawCanvas(); };
-    </script>
+  <script src="app.js" defer></script>
 </body>
 </html>
