@@ -1042,28 +1042,34 @@ function drawCanvas(anim=false){
 
 function renderArena(){
  const box=document.getElementById("arena");
- const level=Math.min(6,Math.max(1,state.level)),info=LEVELS[level-1];
+ 
+ if (!state.arenaLevel) state.arenaLevel = Math.min(6, Math.max(1, state.level));
 
- if (state.arenaLevel !== level || !state.arenaQueue || state.arenaQueue.length === 0) {
-   state.arenaLevel = level;
-   state.arenaQueue = shuffleArray(ARENA_QUESTIONS[level] || ARENA_QUESTIONS[1]);
+ if (!state.arenaQueue || state.arenaQueue.length === 0) {
+   state.arenaQueue = shuffleArray(ARENA_QUESTIONS[state.arenaLevel] || ARENA_QUESTIONS[1]);
+   state.arenaIndex = 0;
+   state.arenaQuestion = null;
+ }
+
+ if (state.arenaIndex >= state.arenaQueue.length) {
+   if(state.arenaLevel < 6) showToast(`¡Avanzas al nivel ${state.arenaLevel + 1} en Arena!`, "good");
+   state.arenaLevel = Math.min(6, state.arenaLevel + 1);
+   state.arenaQueue = shuffleArray(ARENA_QUESTIONS[state.arenaLevel] || ARENA_QUESTIONS[1]);
    state.arenaIndex = 0;
    state.arenaQuestion = null;
  }
 
  let q = state.arenaQuestion;
- if(!q || q.level!==level){
-   if (state.arenaIndex >= state.arenaQueue.length) {
-     state.arenaQueue = shuffleArray(ARENA_QUESTIONS[level] || ARENA_QUESTIONS[1]);
-     state.arenaIndex = 0;
-   }
+ if (!q) {
    q = prepareQuestion(state.arenaQueue[state.arenaIndex]);
-   q.level = level;
+   q.level = state.arenaLevel;
    state.arenaQuestion = q;
    state.arenaQuestionId = q.id;
  }
+ 
+ const info = LEVELS[state.arenaLevel-1];
 
- box.innerHTML=`<div class="challenge"><div class="note">⚔️ Arena · Nivel ${level} ${info.icon} ${info.name} · Ronda ${state.arenaIndex+1}</div>
+ box.innerHTML=`<div class="challenge"><div class="note">⚔️ Arena · Nivel ${state.arenaLevel} ${info.icon} ${info.name} · Ronda ${state.arenaIndex+1}</div>
  <div class="target">${q.q}</div><div class="hint">6 preguntas diferentes por nivel · complejidad creciente · respuestas aleatorias.</div>
  <div class="choices">${q.options.map((x,i)=>`<button type="button" class="choice" onclick="window.answerArena(${i})">${x.text}</button>`).join("")}</div>
  <div id="arenaFeedback" class="feedback hidden"></div></div>`;
@@ -1073,7 +1079,7 @@ function renderArena(){
 window.answerArena = function(i) {
   if (state.arenaAnswered) return; 
   state.arenaAnswered = true;
-  const level = Math.min(6, Math.max(1, state.level)), q = state.arenaQuestion;
+  const q = state.arenaQuestion;
   if (!q || q.id !== state.arenaQuestionId) return;
 
   const ok = i === q.correctIndex;
@@ -1091,14 +1097,13 @@ window.answerArena = function(i) {
   
   if (ok) {
     state.correct++;
-    // Usamos awardMissionXP en lugar de addXP para no borrar la pantalla prematuramente
-    awardMissionXP(20, `arena nivel ${level}`);
+    awardMissionXP(20, `arena nivel ${state.arenaLevel}`);
   } else {
     markFailed(q.q);
     awardMissionXP(5, "repaso de arena");
   }
   
-  renderHeader(); // Actualizamos la barra de XP visualmente sin borrar las opciones
+  renderHeader();
   save();
   if (typeof renderQuests === "function") renderQuests();
   
@@ -1117,28 +1122,32 @@ function renderLabChallenge() {
   const box = document.getElementById("labChallenge");
   if (!box) return;
   
-  const level = Math.min(6, Math.max(1, state.level));
-  const badge = document.getElementById("labQuestionLevel");
-  if (badge) badge.textContent = "Nivel " + level;
+  if (!state.labLevel) state.labLevel = Math.min(6, Math.max(1, state.level));
 
-  if (state.labLevel !== level || !state.labQueue || state.labQueue.length === 0) {
-    state.labLevel = level;
-    state.labQueue = shuffleArray(LAB_QUESTIONS[level] || LAB_QUESTIONS[1]);
+  if (!state.labQueue || state.labQueue.length === 0) {
+    state.labQueue = shuffleArray(LAB_QUESTIONS[state.labLevel] || LAB_QUESTIONS[1]);
+    state.labIndex = 0;
+    state.labQuestion = null;
+  }
+
+  if (state.labIndex >= state.labQueue.length) {
+    if(state.labLevel < 6) showToast(`¡Avanzas al nivel ${state.labLevel + 1} en el Laboratorio!`, "good");
+    state.labLevel = Math.min(6, state.labLevel + 1);
+    state.labQueue = shuffleArray(LAB_QUESTIONS[state.labLevel] || LAB_QUESTIONS[1]);
     state.labIndex = 0;
     state.labQuestion = null;
   }
 
   let q = state.labQuestion;
-  if (!q || q.level !== level) {
-    if (state.labIndex >= state.labQueue.length) {
-      state.labQueue = shuffleArray(LAB_QUESTIONS[level] || LAB_QUESTIONS[1]);
-      state.labIndex = 0;
-    }
+  if (!q) {
     q = prepareQuestion(state.labQueue[state.labIndex]);
-    q.level = level;
+    q.level = state.labLevel;
     state.labQuestion = q;
     state.labQuestionId = q.id;
   }
+
+  const badge = document.getElementById("labQuestionLevel");
+  if (badge) badge.textContent = "Nivel " + state.labLevel;
 
   box.innerHTML = `<div class="target">${q.q}</div>
   <div class="choices">${q.options.map((x, i) => `<button type="button" class="choice" onclick="window.answerLab(${i})">${x.text}</button>`).join("")}</div>
@@ -1149,7 +1158,7 @@ function renderLabChallenge() {
 window.answerLab = function(i) {
   if (state.labAnswered) return; 
   state.labAnswered = true;
-  const level = Math.min(6, Math.max(1, state.level)), q = state.labQuestion;
+  const q = state.labQuestion;
   if (!q || q.id !== state.labQuestionId) return;
 
   const ok = i === q.correctIndex;
@@ -1167,7 +1176,7 @@ window.answerLab = function(i) {
   
   if (ok) {
     state.correct++;
-    awardMissionXP(15, `reto laboratorio nivel ${level}`);
+    awardMissionXP(15, `reto laboratorio nivel ${state.labLevel}`);
   } else {
     markFailed(q.q);
     awardMissionXP(3, "repaso de laboratorio");
@@ -1177,7 +1186,7 @@ window.answerLab = function(i) {
   save();
 
   setTimeout(() => {
-    state.labIndex = (state.labIndex || 0) + 1;
+    state.labIndex++;
     state.labAnswered = false;
     state.labQuestion = null;
     renderLabChallenge();
