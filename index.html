@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>EnlaceQuest: Laboratorio de Enlaces (Extendido)</title>
+    <title>EnlaceQuest: Laboratorio de Enlaces (v3.0)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -90,7 +90,7 @@
 <body>
     <header>
         <h1>EnlaceQuest SJ</h1>
-        <p id="subtitle">Síntesis Molecular, Nomenclatura y Propiedades (v2.0)</p>
+        <p id="subtitle">Síntesis Molecular, Nomenclatura y Propiedades (v3.0)</p>
         <div class="controls">
             <button onclick="setMode('libre')" style="background-color: #e0af68;">⚛️ Modo Libre</button>
             <button onclick="showLogin()" style="background-color: var(--correct); color: #1a1b26;">🎯 Evaluación</button>
@@ -139,7 +139,7 @@
             <button class="action-btn btn-clear" onclick="clearAll()">Vaciar Tubos de Ensayo</button>
         </div>
         <div class="panel glass-panel">
-            <div id="equation-display" class="equation-box">Na + Cl &rarr; NaCl</div>
+            <div id="equation-display" class="equation-box"></div>
             <canvas id="bondCanvas" width="500" height="260"></canvas>
             <div id="result-box" class="result-box">
                 <div style="display: flex; justify-content: space-around; align-items: center;">
@@ -174,7 +174,7 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // --- ELEMENTOS AMPLIADOS ---
+        // ----- ELEMENTOS (con tipo y EN) -----
         const elements = {
             "H":  { name: "Hidrógeno", en: 2.1, type: "nonmetal", color: "#ffffff", ox: "+1, -1" },
             "Na": { name: "Sodio",     en: 0.9, type: "metal",    color: "#f7768e", ox: "+1" },
@@ -187,6 +187,7 @@
             "Zn": { name: "Zinc",      en: 1.6, type: "metal",    color: "#aab7b8", ox: "+2" },
             "Ag": { name: "Plata",     en: 1.9, type: "metal",    color: "#c0c0c0", ox: "+1" },
             "C":  { name: "Carbono",   en: 2.5, type: "nonmetal", color: "#9ece6a", ox: "±4, +2" },
+            "Si": { name: "Silicio",   en: 1.8, type: "nonmetal", color: "#7f8c8d", ox: "±4" },
             "N":  { name: "Nitrógeno", en: 3.0, type: "nonmetal", color: "#7aa2f7", ox: "±3, +5" },
             "P":  { name: "Fósforo",   en: 2.1, type: "nonmetal", color: "#f1fa8c", ox: "±3, +5" },
             "O":  { name: "Oxígeno",   en: 3.5, type: "nonmetal", color: "#bb9af7", ox: "-2" },
@@ -197,83 +198,167 @@
             "I":  { name: "Yodo",      en: 2.5, type: "nonmetal", color: "#9b59b6", ox: "-1, +1, +5, +7" }
         };
 
-        // --- DICCIONARIO DE COMPUESTOS EXTENDIDO (hasta 4 átomos) ---
+        // ----- DICCIONARIO DE COMPUESTOS (100+ fórmulas) -----
         const knownCompounds = {
-            // Binarios H + halógenos
-            "HCl": { name: "Cloruro de Hidrógeno (Ác. Clorhídrico)", group: "Haluro de Hidrógeno", properties: "Gas incoloro, muy soluble en agua formando ácido clorhídrico." },
-            "HF": { name: "Fluoruro de Hidrógeno (Ác. Fluorhídrico)", group: "Haluro de Hidrógeno", properties: "Líquido fumante altamente corrosivo, ataca el vidrio." },
-            "HBr": { name: "Bromuro de Hidrógeno (Ác. Bromhídrico)", group: "Haluro de Hidrógeno", properties: "Gas incoloro que se disuelve fácilmente en agua." },
-            "HI": { name: "Yoduro de Hidrógeno (Ác. Yodhídrico)", group: "Haluro de Hidrógeno", properties: "Gas incoloro, en agua forma un ácido fuerte." },
-            // Óxidos e hidruros sencillos
-            "H2O": { name: "Agua (Óxido de Dihidrógeno)", group: "Óxido / Hidruro", properties: "Líquido vital, solvente universal gracias a sus puentes de hidrógeno." },
-            "H2S": { name: "Ácido Sulfhídrico", group: "Hidruro no metálico / Ácido", properties: "Gas extremadamente tóxico, olor a huevos podridos." },
-            "H2O2": { name: "Peróxido de Hidrógeno (Agua oxigenada)", group: "Peróxido", properties: "Líquido oxidante, usado como desinfectante y blanqueador." },
-            "NH3": { name: "Amoníaco", group: "Hidruro no metálico", properties: "Gas incoloro de olor penetrante, usado en fertilizantes." },
-            "PH3": { name: "Fosfina", group: "Hidruro no metálico", properties: "Gas inflamable y tóxico, con olor a ajo o pescado podrido." },
-            // Óxidos metálicos
-            "Na2O": { name: "Óxido de Sodio", group: "Óxido Básico", properties: "Sólido blanco que reacciona violentamente con agua formando NaOH." },
-            "MgO": { name: "Óxido de Magnesio", group: "Óxido Básico", properties: "Sólido blanco, antiácido y refractario." },
-            "CaO": { name: "Óxido de Calcio (Cal Viva)", group: "Óxido Básico", properties: "Sólido cáustico, reacciona con agua liberando calor." },
+            // Hidrácidos y haluros de hidrógeno
+            "HCl": { name: "Ácido Clorhídrico (Cloruro de Hidrógeno)", group: "Hidrácido", properties: "Gas incoloro, soluble en agua. Ácido fuerte corrosivo." },
+            "HF": { name: "Ácido Fluorhídrico (Fluoruro de Hidrógeno)", group: "Hidrácido", properties: "Líquido fumante altamente corrosivo, ataca el vidrio." },
+            "HBr": { name: "Ácido Bromhídrico (Bromuro de Hidrógeno)", group: "Hidrácido", properties: "Gas incoloro, ácido fuerte." },
+            "HI": { name: "Ácido Yodhídrico (Yoduro de Hidrógeno)", group: "Hidrácido", properties: "Gas incoloro, ácido fuerte." },
+            "H2S": { name: "Ácido Sulfhídrico (Sulfuro de Hidrógeno)", group: "Hidrácido", properties: "Gas tóxico, olor a huevos podridos." },
+            // Hidruros covalentes (grupos 14-15)
+            "CH4": { name: "Metano", group: "Hidruro covalente (alcano)", properties: "Gas inflamable, principal componente del gas natural." },
+            "SiH4": { name: "Silano", group: "Hidruro covalente", properties: "Gas pirofórico, se inflama espontáneamente en aire." },
+            "NH3": { name: "Amoníaco", group: "Hidruro covalente", properties: "Gas incoloro, olor penetrante, fertilizante." },
+            "PH3": { name: "Fosfina", group: "Hidruro covalente", properties: "Gas tóxico, olor a ajo." },
+            // Óxidos metálicos (básicos y anfóteros)
+            "Na2O": { name: "Óxido de Sodio", group: "Óxido Básico", properties: "Sólido blanco, reacciona con agua formando NaOH." },
+            "MgO": { name: "Óxido de Magnesio", group: "Óxido Básico", properties: "Sólido blanco, antiácido." },
+            "CaO": { name: "Óxido de Calcio (Cal Viva)", group: "Óxido Básico", properties: "Sólido cáustico, reacciona exotérmicamente con agua." },
             "Al2O3": { name: "Óxido de Aluminio (Alúmina)", group: "Óxido Anfótero", properties: "Material muy duro, base de rubíes y zafiros." },
-            "Fe2O3": { name: "Óxido de Hierro(III) (Hematita)", group: "Óxido Metálico", properties: "Sólido rojizo, principal mena de hierro (herrumbre)." },
-            "FeO": { name: "Óxido de Hierro(II) (Wustita)", group: "Óxido Metálico", properties: "Polvo negro, inestable a temperatura ambiente." },
-            "CuO": { name: "Óxido de Cobre(II) (Tenorita)", group: "Óxido Metálico", properties: "Sólido negro, semiconductor tipo p." },
-            "Cu2O": { name: "Óxido de Cobre(I) (Cuprita)", group: "Óxido Metálico", properties: "Sólido rojo, usado en pinturas antiincrustantes." },
-            "ZnO": { name: "Óxido de Zinc", group: "Óxido Anfótero", properties: "Polvo blanco, protector solar físico y semiconductor." },
-            "Ag2O": { name: "Óxido de Plata", group: "Óxido Metálico", properties: "Sólido marrón oscuro, usado en baterías de plata-zinc." },
-            // Sales haloideas (haluros metálicos)
-            "NaCl": { name: "Cloruro de Sodio", group: "Sal Haloidea", properties: "Sal de mesa, cristalina, soluble en agua." },
-            "NaF": { name: "Fluoruro de Sodio", group: "Sal Haloidea", properties: "Sólido blanco, usado en pastas dentales." },
-            "NaBr": { name: "Bromuro de Sodio", group: "Sal Haloidea", properties: "Sólido cristalino, usado en medicina como sedante." },
-            "NaI": { name: "Yoduro de Sodio", group: "Sal Haloidea", properties: "Sólido blanco, fuente de yodo en suplementos." },
-            "KCl": { name: "Cloruro de Potasio", group: "Sal Haloidea", properties: "Sólido blanco, fertilizante y sustituto de la sal." },
-            "MgCl2": { name: "Cloruro de Magnesio", group: "Sal Haloidea", properties: "Sólido higroscópico, usado para control de hielo." },
-            "MgF2": { name: "Fluoruro de Magnesio", group: "Sal Haloidea", properties: "Cristal transparente, usado en lentes ópticas." },
-            "CaCl2": { name: "Cloruro de Calcio", group: "Sal Haloidea", properties: "Sal altamente higroscópica, derrite hielo." },
-            "CaF2": { name: "Fluoruro de Calcio (Fluorita)", group: "Sal Haloidea", properties: "Mineral fluorescente, fuente de flúor." },
-            "AlCl3": { name: "Cloruro de Aluminio", group: "Sal Haloidea", properties: "Sólido blanco, catalizador en reacciones de Friedel-Crafts." },
-            "FeCl2": { name: "Cloruro de Hierro(II)", group: "Sal Haloidea", properties: "Sólido verde pálido, soluble en agua." },
-            "FeCl3": { name: "Cloruro de Hierro(III)", group: "Sal Haloidea", properties: "Sólido marrón oscuro, corrosivo, usado en tratamiento de aguas." },
-            "CuCl": { name: "Cloruro de Cobre(I)", group: "Sal Haloidea", properties: "Sólido blanco, insoluble en agua." },
+            "Fe2O3": { name: "Óxido de Hierro(III) (Hematita)", group: "Óxido Metálico", properties: "Sólido rojizo, herrumbre." },
+            "FeO": { name: "Óxido de Hierro(II) (Wustita)", group: "Óxido Metálico", properties: "Polvo negro." },
+            "CuO": { name: "Óxido de Cobre(II) (Tenorita)", group: "Óxido Metálico", properties: "Sólido negro, semiconductor." },
+            "Cu2O": { name: "Óxido de Cobre(I) (Cuprita)", group: "Óxido Metálico", properties: "Sólido rojo, pigmento." },
+            "ZnO": { name: "Óxido de Zinc", group: "Óxido Anfótero", properties: "Polvo blanco, protector solar." },
+            "Ag2O": { name: "Óxido de Plata", group: "Óxido Metálico", properties: "Sólido marrón oscuro, baterías." },
+            // Óxidos no metálicos (ácidos)
+            "CO2": { name: "Dióxido de Carbono", group: "Óxido Ácido", properties: "Gas incoloro, efecto invernadero." },
+            "CO": { name: "Monóxido de Carbono", group: "Óxido Ácido", properties: "Gas tóxico, inodoro." },
+            "NO": { name: "Óxido Nítrico", group: "Óxido No Metálico", properties: "Gas incoloro, neurotransmisor." },
+            "NO2": { name: "Dióxido de Nitrógeno", group: "Óxido Ácido", properties: "Gas marrón, precursor de lluvia ácida." },
+            "N2O": { name: "Óxido Nitroso (Gas de la risa)", group: "Óxido No Metálico", properties: "Anestésico." },
+            "SO2": { name: "Dióxido de Azufre", group: "Óxido Ácido", properties: "Gas irritante, lluvia ácida." },
+            "SO3": { name: "Trióxido de Azufre", group: "Óxido Ácido", properties: "Sólido fumante, precursor H2SO4." },
+            "P2O5": { name: "Pentóxido de Difósforo", group: "Óxido Ácido", properties: "Desecante extremadamente potente." },
+            "Cl2O": { name: "Monóxido de Dicloro", group: "Óxido Ácido", properties: "Agente blanqueador." },
+            "SiO2": { name: "Dióxido de Silicio (Sílice)", group: "Óxido Ácido", properties: "Principal componente de la arena y el vidrio." },
+            // Peróxidos
+            "H2O2": { name: "Peróxido de Hidrógeno (Agua oxigenada)", group: "Peróxido", properties: "Líquido oxidante, desinfectante." },
+            // Sales haloideas (binarias)
+            "NaCl": { name: "Cloruro de Sodio", group: "Sal Haloidea", properties: "Sal de mesa, cristalina." },
+            "NaF": { name: "Fluoruro de Sodio", group: "Sal Haloidea", properties: "Pasta dental." },
+            "NaBr": { name: "Bromuro de Sodio", group: "Sal Haloidea", properties: "Sedante suave." },
+            "NaI": { name: "Yoduro de Sodio", group: "Sal Haloidea", properties: "Suplemento de yodo." },
+            "KCl": { name: "Cloruro de Potasio", group: "Sal Haloidea", properties: "Fertilizante, sustituto de sal." },
+            "MgCl2": { name: "Cloruro de Magnesio", group: "Sal Haloidea", properties: "Control de hielo." },
+            "MgF2": { name: "Fluoruro de Magnesio", group: "Sal Haloidea", properties: "Lentes ópticas." },
+            "CaCl2": { name: "Cloruro de Calcio", group: "Sal Haloidea", properties: "Higroscópico, derrite hielo." },
+            "CaF2": { name: "Fluoruro de Calcio (Fluorita)", group: "Sal Haloidea", properties: "Mineral fluorescente." },
+            "AlCl3": { name: "Cloruro de Aluminio", group: "Sal Haloidea", properties: "Catalizador Friedel-Crafts." },
+            "FeCl2": { name: "Cloruro de Hierro(II)", group: "Sal Haloidea", properties: "Sólido verde pálido." },
+            "FeCl3": { name: "Cloruro de Hierro(III)", group: "Sal Haloidea", properties: "Corrosivo, tratamiento de aguas." },
+            "CuCl": { name: "Cloruro de Cobre(I)", group: "Sal Haloidea", properties: "Sólido blanco, insoluble." },
             "CuCl2": { name: "Cloruro de Cobre(II)", group: "Sal Haloidea", properties: "Sólido azul verdoso, fungicida." },
-            "ZnCl2": { name: "Cloruro de Zinc", group: "Sal Haloidea", properties: "Sólido blanco, fundente en soldaduras." },
-            "AgCl": { name: "Cloruro de Plata", group: "Sal Haloidea", properties: "Sólido blanco, fotosensible (se oscurece con luz)." },
-            "AgBr": { name: "Bromuro de Plata", group: "Sal Haloidea", properties: "Sólido amarillento, usado en fotografía analógica." },
-            "AgI": { name: "Yoduro de Plata", group: "Sal Haloidea", properties: "Sólido amarillo, usado en siembra de nubes." },
-            // Óxidos no metálicos
-            "CO2": { name: "Dióxido de Carbono", group: "Óxido Ácido", properties: "Gas incoloro, producto de la respiración y combustión." },
-            "CO": { name: "Monóxido de Carbono", group: "Óxido Ácido", properties: "Gas tóxico, inodoro, producto de combustión incompleta." },
-            "NO": { name: "Óxido Nítrico", group: "Óxido No Metálico", properties: "Gas incoloro, neurotransmisor y contaminante." },
-            "NO2": { name: "Dióxido de Nitrógeno", group: "Óxido Ácido", properties: "Gas marrón rojizo, tóxico, precursor de lluvia ácida." },
-            "N2O": { name: "Óxido Nitroso (Gas de la risa)", group: "Óxido No Metálico", properties: "Gas incoloro, anestésico suave y propelente." },
-            "SO2": { name: "Dióxido de Azufre", group: "Óxido Ácido", properties: "Gas tóxico, olor a cerilla quemada, genera lluvia ácida." },
-            "SO3": { name: "Trióxido de Azufre", group: "Óxido Ácido", properties: "Sólido fumante, precursor del ácido sulfúrico." },
-            "P2O5": { name: "Pentóxido de Difósforo", group: "Óxido Ácido", properties: "Sólido blanco, desecante extremadamente potente." },
-            "Cl2O": { name: "Monóxido de Dicloro", group: "Óxido Ácido", properties: "Gas marrón amarillento, agente blanqueador." },
-            // Diatómicos elementales
-            "H2": { name: "Hidrógeno Molecular", group: "Elemento Diatómico", properties: "Gas inflamable, el más ligero del universo." },
-            "O2": { name: "Oxígeno Molecular", group: "Elemento Diatómico", properties: "Gas oxidante, esencial para la respiración." },
-            "N2": { name: "Nitrógeno Molecular", group: "Elemento Diatómico", properties: "Gas inerte, compone el 78% del aire." },
-            "F2": { name: "Flúor Molecular", group: "Elemento Diatómico", properties: "Gas amarillo pálido, el más reactivo y electronegativo." },
-            "Cl2": { name: "Cloro Molecular", group: "Elemento Diatómico", properties: "Gas verde amarillento, tóxico, desinfectante." },
+            "ZnCl2": { name: "Cloruro de Zinc", group: "Sal Haloidea", properties: "Fundente en soldadura." },
+            "AgCl": { name: "Cloruro de Plata", group: "Sal Haloidea", properties: "Fotosensible, se oscurece." },
+            "AgBr": { name: "Bromuro de Plata", group: "Sal Haloidea", properties: "Fotografía analógica." },
+            "AgI": { name: "Yoduro de Plata", group: "Sal Haloidea", properties: "Siembra de nubes." },
+            // Hidróxidos (ternarios)
+            "NaOH": { name: "Hidróxido de Sodio (Sosa Cáustica)", group: "Hidróxido", properties: "Base fuerte, corrosiva." },
+            "KOH": { name: "Hidróxido de Potasio", group: "Hidróxido", properties: "Base fuerte, jabones." },
+            "Mg(OH)2": { name: "Hidróxido de Magnesio", group: "Hidróxido", properties: "Antiácido (leche de magnesia)." },
+            "Ca(OH)2": { name: "Hidróxido de Calcio (Cal apagada)", group: "Hidróxido", properties: "Construcción, agricultura." },
+            "Al(OH)3": { name: "Hidróxido de Aluminio", group: "Hidróxido", properties: "Antiácido, floculante." },
+            "Fe(OH)2": { name: "Hidróxido de Hierro(II)", group: "Hidróxido", properties: "Sólido verde, oxidable." },
+            "Fe(OH)3": { name: "Hidróxido de Hierro(III)", group: "Hidróxido", properties: "Sólido marrón, herrumbre." },
+            "Cu(OH)2": { name: "Hidróxido de Cobre(II)", group: "Hidróxido", properties: "Sólido azul, fungicida." },
+            "Zn(OH)2": { name: "Hidróxido de Zinc", group: "Hidróxido", properties: "Anfótero, se disuelve en ácidos y bases." },
+            // Oxisales (ternarios y cuaternarios)
+            "Na2CO3": { name: "Carbonato de Sodio", group: "Oxisal", properties: "Sólido blanco, usado en vidrio y detergentes." },
+            "NaHCO3": { name: "Bicarbonato de Sodio", group: "Oxisal ácida", properties: "Polvo blanco, antiácido y leudante." },
+            "CaCO3": { name: "Carbonato de Calcio", group: "Oxisal", properties: "Piedra caliza, mármol, antiácido." },
+            "MgCO3": { name: "Carbonato de Magnesio", group: "Oxisal", properties: "Polvo blanco, antiácido." },
+            "K2CO3": { name: "Carbonato de Potasio", group: "Oxisal", properties: "Sólido blanco, fabricación de jabón." },
+            "NaNO3": { name: "Nitrato de Sodio (Salitre de Chile)", group: "Oxisal", properties: "Fertilizante, conservante." },
+            "KNO3": { name: "Nitrato de Potasio (Salitre)", group: "Oxisal", properties: "Pólvora, fertilizante." },
+            "CaSO4": { name: "Sulfato de Calcio (Yeso)", group: "Oxisal", properties: "Material de construcción." },
+            "MgSO4": { name: "Sulfato de Magnesio (Sal de Epsom)", group: "Oxisal", properties: "Sales de baño, laxante." },
+            "Na2SO4": { name: "Sulfato de Sodio", group: "Oxisal", properties: "Detergentes, papel." },
+            "Na3PO4": { name: "Fosfato de Sodio", group: "Oxisal", properties: "Agente de limpieza, fertilizante." },
+            "Ca3(PO4)2": { name: "Fosfato de Calcio", group: "Oxisal", properties: "Componente de huesos y dientes." },
+            "Al2(SO4)3": { name: "Sulfato de Aluminio", group: "Oxisal", properties: "Floculante en tratamiento de aguas." },
+            // Diatómicos elementales y ozono
+            "H2": { name: "Hidrógeno Molecular", group: "Elemento Diatómico", properties: "Gas inflamable, el más ligero." },
+            "O2": { name: "Oxígeno Molecular", group: "Elemento Diatómico", properties: "Gas oxidante, respiración." },
+            "N2": { name: "Nitrógeno Molecular", group: "Elemento Diatómico", properties: "Gas inerte, 78% del aire." },
+            "F2": { name: "Flúor Molecular", group: "Elemento Diatómico", properties: "Gas más reactivo." },
+            "Cl2": { name: "Cloro Molecular", group: "Elemento Diatómico", properties: "Gas tóxico, desinfectante." },
             "Br2": { name: "Bromo Molecular", group: "Elemento Diatómico", properties: "Líquido rojo oscuro, vapores tóxicos." },
-            "I2": { name: "Yodo Molecular", group: "Elemento Diatómico", properties: "Sólido gris violáceo que sublima, antiséptico." },
-            "O3": { name: "Ozono", group: "Alótropo del Oxígeno", properties: "Gas azulado, protege de la radiación UV en la estratosfera." },
-            // Algunos compuestos ternarios adicionales (con 4 átomos)
-            "NaOH": { name: "Hidróxido de Sodio (Sosa Cáustica)", group: "Hidróxido", properties: "Sólido blanco, base fuerte, corrosivo." },
-            "KOH": { name: "Hidróxido de Potasio", group: "Hidróxido", properties: "Sólido blanco, base fuerte, usado en jabones." },
-            "Mg(OH)2": { name: "Hidróxido de Magnesio", group: "Hidróxido", properties: "Sólido blanco, antiácido (leche de magnesia)." },
-            "Ca(OH)2": { name: "Hidróxido de Calcio (Cal apagada)", group: "Hidróxido", properties: "Sólido blanco, usado en construcción y agricultura." }
+            "I2": { name: "Yodo Molecular", group: "Elemento Diatómico", properties: "Sólido gris violáceo, antiséptico." },
+            "O3": { name: "Ozono", group: "Alótropo", properties: "Gas azulado, capa de ozono." },
+            // Hidruros metálicos (metal + H)
+            "NaH": { name: "Hidruro de Sodio", group: "Hidruro Metálico", properties: "Sólido gris, reacciona violentamente con agua." },
+            "CaH2": { name: "Hidruro de Calcio", group: "Hidruro Metálico", properties: "Sólido blanco, fuente de hidrógeno." },
         };
 
-        // --- ESTADO ---
-        let slots = [null, null, null, null]; // 4 slots
+        // ----- FUNCIONES AUXILIARES PARA ORDENAR LA FÓRMULA -----
+        function getAtomType(sym) {
+            if (!elements[sym]) return 'unknown';
+            return elements[sym].type; // 'metal' o 'nonmetal'
+        }
+        function getEN(sym) {
+            return elements[sym] ? elements[sym].en : 0;
+        }
+
+        // Ordena los átomos según la función química detectada
+        function orderAtomsForFormula(activeAtoms) {
+            const counts = {};
+            activeAtoms.forEach(a => counts[a] = (counts[a] || 0) + 1);
+            const symbols = Object.keys(counts);
+            const metals = symbols.filter(s => elements[s].type === 'metal');
+            const nonmetals = symbols.filter(s => elements[s].type === 'nonmetal');
+
+            // Caso 1: solo no metales (compuestos covalentes)
+            if (metals.length === 0) {
+                // Si hay hidrógeno entre los no metales
+                if (counts['H']) {
+                    const otherNonmetals = nonmetals.filter(s => s !== 'H');
+                    // Grupos 16 y 17 (O, S, Se, Te, F, Cl, Br, I, At): H primero
+                    const group16_17 = ['O', 'S', 'Se', 'Te', 'F', 'Cl', 'Br', 'I', 'At'];
+                    const hasGroup16_17 = otherNonmetals.some(s => group16_17.includes(s));
+                    if (hasGroup16_17) {
+                        // Orden: H + otros ordenados por EN creciente
+                        const othersSorted = otherNonmetals.sort((a,b) => getEN(a) - getEN(b));
+                        return ['H', ...othersSorted];
+                    } else {
+                        // Grupos 14 y 15 (C, Si, N, P, As, Sb): no metal primero, H después
+                        const othersSorted = otherNonmetals.sort((a,b) => getEN(a) - getEN(b));
+                        return [...othersSorted, 'H'];
+                    }
+                } else {
+                    // Sin H, ordenar por EN creciente
+                    return symbols.sort((a,b) => getEN(a) - getEN(b));
+                }
+            }
+            // Caso 2: metales presentes (iónicos o sales)
+            else {
+                // Metales primero (ordenados por EN creciente)
+                const sortedMetals = metals.sort((a,b) => getEN(a) - getEN(b));
+                const nonmetalsWithoutH = nonmetals.filter(s => s !== 'H');
+                // Si hay oxígeno e hidrógeno juntos -> probable hidróxido: metal, O, H
+                if (nonmetals.includes('O') && nonmetals.includes('H') && nonmetals.length === 2) {
+                    // Orden típico NaOH: Na, O, H
+                    return [...sortedMetals, 'O', 'H'];
+                }
+                // Si hay oxígeno y otro no metal (oxisal): metal, no metal central (el de menor EN después del metal), O
+                if (nonmetals.includes('O') && nonmetalsWithoutH.length > 1) {
+                    const central = nonmetalsWithoutH.filter(s => s !== 'O').sort((a,b) => getEN(a) - getEN(b));
+                    // Ej: Na, C, O -> Na2CO3; orden metal, central, O
+                    return [...sortedMetals, ...central, 'O'];
+                }
+                // Resto: metales, luego no metales ordenados por EN creciente
+                const sortedNonmetals = nonmetals.sort((a,b) => getEN(a) - getEN(b));
+                return [...sortedMetals, ...sortedNonmetals];
+            }
+        }
+
+        // ----- ESTADO DEL JUEGO -----
+        let slots = [null, null, null, null];
         let activeAtoms = [];
-        let animState = 'idle';
-        let animProgress = 0;
+        let animState = 'idle', animProgress = 0;
         let currentBond = null;
         let currentStudentName = "";
-
         let gameActive = false, currentMission = 0, timeLeft = 90, timer, correctAnswers = 0;
         let activeMissions = [];
 
@@ -281,29 +366,30 @@
             { text: "Sintetiza Agua (H2O).", check: (res) => res.rawFormula === 'H2O' },
             { text: "Crea Dióxido de Carbono (CO2).", check: (res) => res.rawFormula === 'CO2' },
             { text: "Crea Sal de Mesa (NaCl).", check: (res) => res.rawFormula === 'NaCl' },
-            { text: "Crea Cloruro de Calcio (CaCl2).", check: (res) => res.rawFormula === 'CaCl2' },
-            { text: "Forma una molécula biatómica de Oxígeno (O2).", check: (res) => res.rawFormula === 'O2' },
-            { text: "Crea un enlace COVALENTE APOLAR (ΔEN ≤ 0.4) con solo 2 átomos.", check: (res) => res.type === 'apolar' && res.atoms.length === 2 },
-            { text: "Construye una molécula IÓNICA usando 3 átomos.", check: (res) => res.type === 'ionic' && res.atoms.length === 3 },
-            { text: "Construye un compuesto COVALENTE POLAR con 3 átomos.", check: (res) => res.type === 'polar' && res.atoms.length === 3 },
-            { text: "Sintetiza Ácido Sulfhídrico (H2S).", check: (res) => res.rawFormula === 'H2S' },
+            { text: "Crea Ácido Clorhídrico (HCl).", check: (res) => res.rawFormula === 'HCl' },
             { text: "Sintetiza Amoníaco (NH3).", check: (res) => res.rawFormula === 'NH3' },
-            { text: "Crea Cloruro de Hidrógeno (HCl).", check: (res) => res.rawFormula === 'HCl' },
-            { text: "Sintetiza Óxido de Magnesio (MgO).", check: (res) => res.rawFormula === 'MgO' },
-            { text: "Crea Fluoruro de Sodio (NaF).", check: (res) => res.rawFormula === 'NaF' },
-            { text: "Sintetiza Cloruro de Potasio (KCl).", check: (res) => res.rawFormula === 'KCl' },
-            { text: "Construye una molécula de Flúor (F2).", check: (res) => res.rawFormula === 'F2' },
-            { text: "Sintetiza Monóxido de Carbono (CO).", check: (res) => res.rawFormula === 'CO' },
-            { text: "Forma Óxido de Aluminio (Al2O3).", check: (res) => res.rawFormula === 'Al2O3' },
+            { text: "Sintetiza Metano (CH4).", check: (res) => res.rawFormula === 'CH4' },
+            { text: "Forma Hidróxido de Sodio (NaOH).", check: (res) => res.rawFormula === 'NaOH' },
+            { text: "Sintetiza Ácido Sulfhídrico (H2S).", check: (res) => res.rawFormula === 'H2S' },
+            { text: "Crea Óxido de Calcio (CaO).", check: (res) => res.rawFormula === 'CaO' },
+            { text: "Sintetiza Bicarbonato de Sodio (NaHCO3).", check: (res) => res.rawFormula === 'NaHCO3' },
+            { text: "Crea Carbonato de Calcio (CaCO3).", check: (res) => res.rawFormula === 'CaCO3' },
+            { text: "Forma una molécula diatómica de Oxígeno (O2).", check: (res) => res.rawFormula === 'O2' },
+            { text: "Construye un compuesto IÓNICO con 3 átomos.", check: (res) => res.type === 'ionic' && res.atoms.length === 3 },
+            { text: "Construye un compuesto COVALENTE POLAR con 3 átomos.", check: (res) => res.type === 'polar' && res.atoms.length === 3 },
             { text: "Sintetiza Cloruro de Plata (AgCl).", check: (res) => res.rawFormula === 'AgCl' },
-            { text: "Crea Dióxido de Azufre (SO2).", check: (res) => res.rawFormula === 'SO2' },
-            { text: "Sintetiza Ozono (O3).", check: (res) => res.rawFormula === 'O3' },
-            { text: "Crea una molécula biatómica de Cloro (Cl2).", check: (res) => res.rawFormula === 'Cl2' },
-            { text: "Sintetiza Peróxido de Hidrógeno (H2O2).", check: (res) => res.rawFormula === 'H2O2' },
-            { text: "Crea Bromuro de Plata (AgBr).", check: (res) => res.rawFormula === 'AgBr' }
+            { text: "Crea Óxido de Aluminio (Al2O3).", check: (res) => res.rawFormula === 'Al2O3' },
+            { text: "Sintetiza Sulfato de Calcio (CaSO4).", check: (res) => res.rawFormula === 'CaSO4' },
+            { text: "Crea Hidróxido de Magnesio (Mg(OH)2).", check: (res) => res.rawFormula === 'Mg(OH)2' },
+            { text: "Forma un compuesto con carácter IÓNICO de solo 2 átomos.", check: (res) => res.type === 'ionic' && res.atoms.length === 2 },
+            { text: "Sintetiza Dióxido de Azufre (SO2).", check: (res) => res.rawFormula === 'SO2' },
+            { text: "Crea una molécula de Ozono (O3).", check: (res) => res.rawFormula === 'O3' },
+            { text: "Sintetiza Ácido Fluorhídrico (HF).", check: (res) => res.rawFormula === 'HF' },
+            { text: "Forma Silano (SiH4).", check: (res) => res.rawFormula === 'SiH4' },
+            { text: "Sintetiza Nitrato de Potasio (KNO3).", check: (res) => res.rawFormula === 'KNO3' }
         ];
 
-        // --- UI ---
+        // ----- UI -----
         function initGrid() {
             const grid = document.getElementById('atom-grid');
             grid.innerHTML = '';
@@ -349,14 +435,16 @@
 
         function buildEquation() {
             const reactants = activeAtoms.join(" + ");
+            const ordered = orderAtomsForFormula(activeAtoms);
             const counts = {};
             activeAtoms.forEach(a => counts[a] = (counts[a] || 0) + 1);
-            const sortedUnique = Object.keys(counts).sort((a,b) => elements[a].en - elements[b].en);
+            
             let productRaw = "", productHTML = "";
-            sortedUnique.forEach(sym => {
+            ordered.forEach(sym => {
+                if (!counts[sym]) return; // seguridad
                 productRaw += sym;
                 productHTML += sym;
-                if(counts[sym] > 1) {
+                if (counts[sym] > 1) {
                     productRaw += counts[sym];
                     productHTML += `<sub>${counts[sym]}</sub>`;
                 }
@@ -402,7 +490,7 @@
             } else {
                 document.getElementById('comp-name').innerText = currentBond.rawFormula + " (Desconocido/Inestable)";
                 document.getElementById('comp-group').innerText = "Sin clasificar";
-                document.getElementById('comp-props').innerText = "Las valencias no encajan o esta mezcla teórica no existe establemente bajo condiciones normales.";
+                document.getElementById('comp-props').innerText = "Combinación no registrada en la base de datos.";
             }
             document.getElementById('result-box').style.display = 'block';
 
@@ -412,7 +500,7 @@
                         alert("¡Correcto! Molécula sintetizada con éxito.");
                         correctAnswers++;
                     } else {
-                        alert("¡Incorrecto! La síntesis no cumple con el objetivo de la misión.");
+                        alert("¡Incorrecto! La síntesis no cumple con el objetivo.");
                     }
                     currentMission++;
                     animState = 'idle';
@@ -424,7 +512,7 @@
             }
         }
 
-        // --- CANVAS (soporte para 2,3,4 átomos) ---
+        // ----- CANVAS (soporte 2-4 átomos) -----
         const canvas = document.getElementById('bondCanvas');
         const ctx = canvas.getContext('2d');
         const positionsMap = {
@@ -498,7 +586,7 @@
             else { drawCanvas(); requestAnimationFrame(animateReaction); }
         }
 
-        // --- SISTEMA DE JUEGO ---
+        // ----- SISTEMA DE JUEGO -----
         window.setMode = (mode) => {
             gameActive = false; clearInterval(timer);
             document.getElementById('mission-panel').style.display = 'none';
