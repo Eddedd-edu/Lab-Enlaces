@@ -1242,6 +1242,50 @@ async function finishExam(){
 }
 
 /* =========================
+   MISIONES DE DOMINIO Y PERFIL
+========================= */
+window.renderQuests = function() {
+  const box = document.getElementById("questList");
+  if(!box) return;
+  const quests = [
+    {t: "Dominio de la Arena", d: "Alcanza una racha de 10 aciertos.", n: state.bestStreak, g: 10},
+    {t: "Erudito Químico", d: "Alcanza 1000 XP.", n: state.xp, g: 1000},
+    {t: "Maestro de Laboratorio", d: "Descubre todos los compuestos.", n: state.discoveries.size, g: Object.keys(COMPOUNDS).length}
+  ];
+  box.innerHTML = "";
+  quests.forEach(q => {
+    const done = q.n >= q.g;
+    const e = document.createElement("div");
+    e.className = `quest ${done ? "done" : ""}`;
+    e.innerHTML = `<b>${done ? "✅" : "🎯"} ${q.t}</b>
+     <span style="float:right;font-weight:900;color:${done ? "var(--green)" : "var(--yellow)"}">${Math.min(q.n, q.g)}/${q.g}</span>
+     <br><small>${q.d}</small>`;
+    box.appendChild(e);
+  });
+};
+
+function renderProfile() {
+  const p = document.getElementById("profileDetails");
+  if(!p) return;
+  p.innerHTML = `
+    <div class="info">
+      <div><span class="label">Estudiante:</span> ${state.name}</div>
+      <div><span class="label">Nivel Actual:</span> ${state.level}</div>
+      <div><span class="label">Experiencia:</span> ${state.xp} XP</div>
+      <div><span class="label">Mejor racha:</span> ${state.bestStreak}</div>
+      <div><span class="label">Aciertos:</span> ${state.correct}</div>
+    </div>
+  `;
+}
+
+window.resetLocalProgress = function() {
+  if(confirm("¿Seguro que deseas reiniciar tu progreso local?")) {
+    localStorage.removeItem("enlacequest_v57");
+    location.reload();
+  }
+};
+
+/* =========================
    RENDER
 ========================= */
 function renderHeader(){
