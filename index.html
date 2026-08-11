@@ -1056,63 +1056,107 @@ function renderArena(){
  <div id="arenaFeedback" class="feedback hidden"></div></div>`;
  save();
 }
-window.answerArena=function(i){
- if(state.arenaAnswered)return; state.arenaAnswered=true;
- const level=Math.min(6,Math.max(1,state.level)),q=state.arenaQuestion;
- if(!q || q.id!==state.arenaQuestionId)return;
- const ok=i===q.correctIndex;
- document.querySelectorAll("#arena .choice").forEach((b,j)=>{b.disabled=true;if(j===q.correctIndex)b.classList.add("correct");if(j===i&&!ok)b.classList.add("wrong")});
- const fb=document.getElementById("arenaFeedback");fb.classList.remove("hidden");
- fb.innerHTML=ok?`<b>🏆 ¡Dominio!</b> ${q.e}<br><span class="note">+20 XP</span>`:`<b>📚 Repaso obligatorio.</b> ${q.e}<br><span class="note">+5 XP por revisar.</span>`;
- updateStreak(ok);if(ok){state.correct++;addXP(20,`arena nivel ${level}`)}else{markFailed(q.q);addXP(5,"repaso de arena")}
- save();renderQuests();
- setTimeout(()=>{
-   state.arenaIndex++;
-   state.arenaAnswered=false;
-   state.arenaQuestion=null;
-   state.arenaQuestionId=null;
-   renderArena();
- },1800);
+window.answerArena = function(i) {
+  if (state.arenaAnswered) return; 
+  state.arenaAnswered = true;
+  const level = Math.min(6, Math.max(1, state.level)), q = state.arenaQuestion;
+  if (!q || q.id !== state.arenaQuestionId) return;
+
+  const ok = i === q.correctIndex;
+  document.querySelectorAll("#arena .choice").forEach((b, j) => {
+    b.disabled = true;
+    if (j === q.correctIndex) b.classList.add("correct");
+    if (j === i && !ok) b.classList.add("wrong");
+  });
+
+  const fb = document.getElementById("arenaFeedback");
+  fb.classList.remove("hidden");
+  fb.innerHTML = ok ? `<b>🏆 ¡Dominio!</b> ${q.e}<br><span class="note">+20 XP</span>` : `<b>📚 Repaso obligatorio.</b> ${q.e}<br><span class="note">+5 XP por revisar.</span>`;
+  
+  updateStreak(ok);
+  
+  if (ok) {
+    state.correct++;
+    // Usamos awardMissionXP en lugar de addXP para no borrar la pantalla prematuramente
+    awardMissionXP(20, `arena nivel ${level}`);
+  } else {
+    markFailed(q.q);
+    awardMissionXP(5, "repaso de arena");
+  }
+  
+  renderHeader(); // Actualizamos la barra de XP visualmente sin borrar las opciones
+  save();
+  renderQuests();
+  
+  setTimeout(() => {
+    state.arenaIndex++;
+    state.arenaAnswered = false;
+    state.arenaQuestion = null;
+    // NO hacemos state.arenaQuestionId = null para que getQuestion pueda evitar repetirla
+    renderArena();
+  }, 1800);
 };
 
-function renderQuests(){
- renderAcademyQuests();
- const box=document.getElementById("questList");box.innerHTML="";
- const quests=[
-  {t:"Descubre 4 sustancias",d:"Registra 4 compuestos en el laboratorio.",n:state.discoveries.size,g:4},
-  {t:"Construye una sal iónica",d:"Descubre NaCl, KCl, MgCl₂, CaCl₂ o similares.",n:["NaCl","KCl","MgCl2","CaCl2"].filter(x=>state.discoveries.has(x)).length,g:1},
-  {t:"Explora la polaridad",d:"Descubre NH₃, H₂O, HCl o SO₂.",n:["NH3","H2O","HCl","SO2"].filter(x=>state.discoveries.has(x)).length,g:2},
-  {t:"Completa un capítulo",d:"Alcanza el número de descubrimientos requerido.",n:state.completedLevels.size,g:1},
-  {t:"Racha de 5",d:"Consigue cinco aciertos consecutivos.",n:Math.min(state.bestStreak,5),g:5}
- ];
- quests.forEach(q=>{const done=q.n>=q.g;const e=document.createElement("div");e.className=`quest ${done?"done":""}`;e.innerHTML=`<b>${done?"✅":"🎯"} ${q.t}</b><br><small>${q.d}</small><span style="float:right">${q.n}/${q.g}</span>`;box.appendChild(e)})
+/* =========================
+   FUNCIONES FALTANTES DEL LABORATORIO
+========================= */
+function renderLabChallenge() {
+  const box = document.getElementById("labChallenge");
+  if (!box) return;
+  
+  const level = Math.min(6, Math.max(1, state.level));
+  const badge = document.getElementById("labQuestionLevel");
+  if (badge) badge.textContent = "Nivel " + level;
+
+  let q = state.labQuestion;
+  if (!q || q.level !== level) {
+    q = getQuestion("lab", level, state.labQuestionId);
+    q.level = level;
+    state.labQuestion = q;
+    state.labQuestionId = q.id;
+  }
+
+  box.innerHTML = `<div class="target">${q.q}</div>
+  <div class="choices">${q.options.map((x, i) => `<button type="button" class="choice" onclick="window.answerLab(${i})">${x.text}</button>`).join("")}</div>
+  <div id="labFeedback" class="feedback hidden"></div>`;
+  save();
 }
-function renderProfile(){
- const next=currentLevel()<LEVELS.length?LEVELS[currentLevel()].need:LEVELS[LEVELS.length-1].need+100;
- document.getElementById("profileDetails").innerHTML=`
-  <div class="pillrow">
-   <span class="pill">Nivel ${state.level}</span><span class="pill">🔥 Mejor racha ${state.bestStreak}</span>
-   <span class="pill">🧪 ${state.discoveries.size} descubrimientos</span><span class="pill">🪙 ${state.coins} química</span>
-  </div>
-  <hr style="border-color:#293452;margin:14px 0">
-  <p><b>Dominio global:</b> ${totalMastery()}%</p>
-  <div class="xpbar"><div class="xpfill" style="width:${Math.min(100,(state.xp/(next||1))*100)}%"></div></div>
-  <p class="note">${currentLevel()===LEVELS.length?"👑 Has llegado a la zona de maestría.":`Siguiente desbloqueo importante: ${next} XP.`}</p>`;
- loadLeaderboard();
-}
-async function loadLeaderboard(){
- const list=document.getElementById("leaderboard");
- try{
-  const q=query(collection(db,"records_enlace"),orderBy("score","desc"),limit(20)),snap=await getDocs(q);
-  list.innerHTML="";
-  if(snap.empty){list.innerHTML="<li>Aún no hay registros.</li>";return}
-  let i=1;snap.forEach(d=>{const r=d.data();const li=document.createElement("li");li.innerHTML=`<span>${i===1?"🥇":i===2?"🥈":i===3?"🥉":"#"+i} ${r.name||"Estudiante"}</span><b>${r.score}</b>`;list.appendChild(li);i++})
- }catch(e){list.innerHTML="<li>No se pudo cargar el ranking.</li>"}
-}
-window.resetLocalProgress=function(){
- if(confirm("¿Reiniciar todo el progreso de este dispositivo?")){
-  localStorage.removeItem("enlacequest_v57");location.reload();
- }
+
+window.answerLab = function(i) {
+  if (state.labAnswered) return; 
+  state.labAnswered = true;
+  const level = Math.min(6, Math.max(1, state.level)), q = state.labQuestion;
+  if (!q || q.id !== state.labQuestionId) return;
+
+  const ok = i === q.correctIndex;
+  document.querySelectorAll("#labChallenge .choice").forEach((b, j) => {
+    b.disabled = true;
+    if (j === q.correctIndex) b.classList.add("correct");
+    if (j === i && !ok) b.classList.add("wrong");
+  });
+
+  const fb = document.getElementById("labFeedback");
+  fb.classList.remove("hidden");
+  fb.innerHTML = ok ? `<b>✅ ¡Correcto!</b> ${q.e}<br><span class="note">+15 XP</span>` : `<b>🔬 Analiza:</b> ${q.e}<br><span class="note">+3 XP por repaso.</span>`;
+
+  updateStreak(ok);
+  
+  if (ok) {
+    state.correct++;
+    awardMissionXP(15, `reto laboratorio nivel ${level}`);
+  } else {
+    markFailed(q.q);
+    awardMissionXP(3, "repaso de laboratorio");
+  }
+  
+  renderHeader();
+  save();
+
+  setTimeout(() => {
+    state.labAnswered = false;
+    state.labQuestion = null;
+    renderLabChallenge();
+  }, 1800);
 };
 
 /* =========================
